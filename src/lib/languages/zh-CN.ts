@@ -2,6 +2,15 @@ import type en from "./en";
 
 const zhCN: typeof en = {
   redirecting: "正在跳转",
+  tabGeneral: "通用",
+  tabLive: "实时",
+  tabNetwork: "网络",
+  tabShortcuts: "快捷键",
+  tabHistory: "历史",
+  tabDebug: "调试",
+  basicSettings: "基础设置",
+  appLanguage: "界面语言",
+  appLanguageDesc: "选择应用程序的全局显示语言。",
   favorites: "收藏",
   showFavoritesOnly: "仅显示收藏",
   deleteFailed: "删除失败：{{error}}",

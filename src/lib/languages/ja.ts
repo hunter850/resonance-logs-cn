@@ -2,6 +2,15 @@ import type en from "./en";
 
 const ja: typeof en = {
   redirecting: "リダイレクト中",
+  tabGeneral: "一般",
+  tabLive: "ライブ",
+  tabNetwork: "ネットワーク",
+  tabShortcuts: "ショートカット",
+  tabHistory: "履歴",
+  tabDebug: "デバッグ",
+  basicSettings: "基本設定",
+  appLanguage: "言語設定",
+  appLanguageDesc: "アプリケーション全体の表示言語を選択します。",
   favorites: "お気に入り",
   showFavoritesOnly: "お気に入りのみ表示",
   deleteFailed: "削除に失敗しました：{{error}}",

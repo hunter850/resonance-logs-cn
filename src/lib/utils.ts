@@ -24,7 +24,37 @@ export type WithoutChildrenOrChild<T> = WithoutChildren<WithoutChild<T>>;
 export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?: U | null };
 
 // i18n
-export const locale = writable("en");
+function getInitialLocale() {
+  if (typeof window === "undefined") return "en";
+  
+  const savedLocale = localStorage.getItem("locale");
+  const validLocales = Object.keys(translations);
+  
+  if (savedLocale && validLocales.includes(savedLocale)) {
+    return savedLocale;
+  }
+  
+  const navLang = navigator.language;
+  if (validLocales.includes(navLang)) {
+    return navLang;
+  }
+  
+  // Attempt to match prefix (e.g. en-US -> en)
+  const prefix = navLang.split('-')[0] || "";
+  const match = validLocales.find(l => l.startsWith(prefix) || l === prefix);
+  if (match) return match;
+  
+  return "en";
+}
+
+export const locale = writable(getInitialLocale());
+
+if (typeof window !== "undefined") {
+  locale.subscribe((value) => {
+    localStorage.setItem("locale", value);
+  });
+}
+
 export const locales = Object.keys(translations);
 
 type LocaleKey = keyof typeof translations;

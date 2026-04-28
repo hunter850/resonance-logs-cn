@@ -4,21 +4,24 @@
    * Contains Live settings, Network settings, Shortcuts, History, and Debug tabs.
    */
   import * as Tabs from "$lib/components/ui/tabs/index.js";
+  import GeneralSettings from "./general.svelte";
   import LiveSettings from "./live.svelte";
   import NetworkSettings from "./network.svelte";
   import ShortcutsSettings from "./shortcuts.svelte";
   import HistorySettings from "./history.svelte";
   import DebugSettings from "./debug.svelte";
+  import { t } from "$lib/utils";
 
-  const settingsTabs = [
-    { id: "live", label: "实时" },
-    { id: "network", label: "网络" },
-    { id: "shortcuts", label: "快捷键" },
-    { id: "history", label: "历史" },
-    { id: "debug", label: "调试" },
-  ];
+  let settingsTabs = $derived([
+    { id: "general", label: $t("tabGeneral") },
+    { id: "live", label: $t("tabLive") },
+    { id: "network", label: $t("tabNetwork") },
+    { id: "shortcuts", label: $t("tabShortcuts") },
+    { id: "history", label: $t("tabHistory") },
+    { id: "debug", label: $t("tabDebug") },
+  ]);
 
-  let activeTab = $state("live");
+  let activeTab = $state("general");
 </script>
 
 <div class="space-y-4">
@@ -28,6 +31,10 @@
         <Tabs.Trigger value={tab.id}>{tab.label}</Tabs.Trigger>
       {/each}
     </Tabs.List>
+
+    <Tabs.Content value="general">
+      <GeneralSettings />
+    </Tabs.Content>
 
     <LiveSettings />
 

@@ -2,6 +2,15 @@ import type en from "./en";
 
 const zhTW: typeof en = {
   redirecting: "正在跳轉",
+  tabGeneral: "通用",
+  tabLive: "即時",
+  tabNetwork: "網路",
+  tabShortcuts: "快捷鍵",
+  tabHistory: "歷史",
+  tabDebug: "除錯",
+  basicSettings: "基礎設定",
+  appLanguage: "介面語言",
+  appLanguageDesc: "選擇應用程式的全域顯示語言。",
   favorites: "收藏",
   showFavoritesOnly: "僅顯示收藏",
   deleteFailed: "刪除失敗：{{error}}",
