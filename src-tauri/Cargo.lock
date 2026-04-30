@@ -4117,7 +4117,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "resonance-logs-cn"
+name = "resonance-logs-i18n"
 version = "0.1.2"
 dependencies = [
  "anyhow",

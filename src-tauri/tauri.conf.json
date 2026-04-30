@@ -1,8 +1,8 @@
 {
     "$schema": "https://schema.tauri.app/config/2",
-    "productName": "resonance-logs-cn",
+    "productName": "resonance-logs-i18n",
     "version": "0.1.2",
-    "identifier": "com.resonance-logs-cn",
+    "identifier": "com.resonance-logs-i18n",
     "build": {
         "beforeDevCommand": "npm run dev:stop-windivert",
         "beforeBuildCommand": "npm run build:stop-windivert",
@@ -12,7 +12,7 @@
     "app": {
         "windows": [
             {
-                "title": "Resonance Logs CN - Live",
+                "title": "Resonance Logs I18n - Live",
                 "label": "live",
                 "url": "live",
                 "shadow": false,
@@ -24,7 +24,7 @@
                 "skipTaskbar": true
             },
             {
-                "title": "Resonance Logs CN - Main 0.1.2",
+                "title": "Resonance Logs I18n - Main 0.1.2",
                 "label": "main",
                 "url": "main",
                 "width": 1200,
