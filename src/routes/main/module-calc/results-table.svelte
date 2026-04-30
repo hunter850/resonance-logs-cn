@@ -2,6 +2,7 @@
   import { Button } from "$lib/components/ui/button";
   import type { ModuleSolution } from "$lib/api";
   import AttrBadge, { sortAttrEntries } from "./attr-badge.svelte";
+  import { t } from "$lib/utils";
 
   let {
     solutions = [],
@@ -13,7 +14,7 @@
 </script>
 
 {#if !solutions.length}
-  <div class="text-sm text-muted-foreground">暂无结果</div>
+  <div class="text-sm text-muted-foreground">{$t("noResults")}</div>
 {:else}
   <div class="space-y-3">
     {#each solutions as sol, idx}
@@ -34,7 +35,7 @@
             </div>
             <div class="min-w-0">
               <div class="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                方案得分
+                {$t("solutionScore")}
               </div>
               <div class="mt-1 text-2xl font-semibold text-foreground">{sol.score}</div>
             </div>
@@ -54,7 +55,7 @@
                 class="w-full xl:w-auto"
                 onclick={() => onview?.(sol)}
               >
-                查看详情
+                {$t("viewDetails")}
               </Button>
             </div>
           </div>

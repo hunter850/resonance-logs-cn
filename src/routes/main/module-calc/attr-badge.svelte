@@ -20,6 +20,8 @@
 </script>
 
 <script lang="ts">
+  import { t } from "$lib/utils";
+
   let {
     name,
     value,
@@ -37,13 +39,13 @@
 
 <div
   class={`attr-badge ${compact ? "attr-badge--compact" : ""} ${tierClass}`}
-  aria-label={`${name} +${value}，${level}级`}
+  aria-label={`${name} +${value}, ${level}${$t("levelUnit")}`}
 >
   <div class="attr-badge__name">{name}</div>
   <div class="attr-badge__meta">
     <span class="attr-badge__value">+{value}</span>
     {#if isHighlighted}
-      <span class="attr-badge__level">{level}级</span>
+      <span class="attr-badge__level">{level}{$t("levelUnit")}</span>
     {/if}
   </div>
 </div>

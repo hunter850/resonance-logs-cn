@@ -2,6 +2,7 @@
     import SettingsSelect from "./settings-select.svelte";
     import SettingsDropdown from "./settings-dropdown.svelte";
     import { SETTINGS } from "$lib/settings-store";
+    import { t } from "$lib/utils";
     import { invoke } from "@tauri-apps/api/core";
     import { onMount } from "svelte";
     import { untrack } from "svelte";
@@ -77,13 +78,13 @@
     >
         <div class="px-4 py-3">
             <h2 class="text-base font-semibold text-foreground mb-2">
-                抓包
+                {$t("packetCapture")}
             </h2>
 
             <SettingsSelect
                 bind:selected={SETTINGS.packetCapture.state.method}
-                label="捕获方式"
-                description="选择用于捕获网络数据包的方法（需要重启应用）。"
+                label={$t("captureMethod")}
+                description={$t("captureMethodDesc")}
                 values={["WinDivert", "Npcap"]}
             />
 
@@ -92,21 +93,17 @@
                     <div
                         class="mt-2 p-3 bg-destructive/10 text-destructive rounded-md text-sm"
                     >
-                        未检测到 Npcap。请从 <a
-                            href="https://npcap.com/"
-                            target="_blank"
-                            class="underline">npcap.com</a
-                        > 安装 Npcap 以使用该功能。
+                        {$t("npcapNotDetected", { url: "https://npcap.com/" })}
                     </div>
                 {:else}
                     <SettingsDropdown
                         bind:selected={SETTINGS.packetCapture.state.npcapDevice}
-                        label="网络设备"
-                        description="选择用于捕获流量的网卡。"
+                        label={$t("networkDevice")}
+                        description={$t("networkDeviceDesc")}
                         options={deviceOptions}
                         placeholder={loading
-                            ? "正在加载设备..."
-                            : "选择设备"}
+                            ? $t("loadingDevices")
+                            : $t("selectDevice")}
                     />
                 {/if}
             {/if}

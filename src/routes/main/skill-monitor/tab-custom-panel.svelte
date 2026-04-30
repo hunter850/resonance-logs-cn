@@ -1,5 +1,6 @@
 <script lang="ts">
   import BuffSearchResultGrid from "$lib/components/BuffSearchResultGrid.svelte";
+  import { t } from "$lib/utils";
   import type { BuffDefinition, BuffNameInfo } from "$lib/config/buff-name-table";
   import type {
     CustomPanelGroup,
@@ -135,7 +136,7 @@
   function buffStatusLabel(buffId: number): string | null {
     const location = getEntryLocation("buff", buffId);
     if (!location) return null;
-    return location.groupId === selectedGroup?.id ? "当前组已添加" : `已在${location.groupName}`;
+    return location.groupId === selectedGroup?.id ? $t("alreadyAddedToCurrentGroup") : $t("alreadyAddedToOtherGroup", { name: location.groupName });
   }
 
   function toggleDraftRef(
@@ -176,9 +177,9 @@
 <div class="space-y-6">
   <div class="rounded-lg border border-border/60 bg-card/40 p-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.02)] space-y-4">
     <div>
-      <h2 class="text-base font-semibold text-foreground">自定义监控区</h2>
+      <h2 class="text-base font-semibold text-foreground">{$t("customMonitorArea")}</h2>
       <p class="text-xs text-muted-foreground">
-        可创建多个文本监控区；同一个 Buff 或计数器在所有监控区内全局唯一。
+        {$t("customMonitorAreaDesc")}
       </p>
     </div>
 
@@ -188,13 +189,13 @@
         class="min-h-11 rounded-lg border border-border/60 bg-muted/20 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted/40 cursor-pointer"
         onclick={addCustomPanelGroup}
       >
-        新建监控区
+        {$t("newMonitorArea")}
       </button>
       <div class="text-xs text-muted-foreground" role="status" aria-live="polite">
         {#if selectedGroup}
-          当前编辑：{selectedGroup.name}
+          {$t("currentlyEditing", { name: selectedGroup.name })}
         {:else}
-          请选择或新建一个监控区
+          {$t("selectOrNewArea")}
         {/if}
       </div>
     </div>
@@ -215,7 +216,7 @@
             >
               <div class="text-sm font-medium text-foreground">{group.name}</div>
               <div class="mt-1 text-xs text-muted-foreground">
-                条目 {group.entries.length} 个
+                {$t("itemsCount", { count: String(group.entries.length) })}
               </div>
             </button>
             <button
@@ -223,7 +224,7 @@
               class="min-h-11 rounded-md border border-border/60 px-3 py-1.5 text-xs text-destructive transition-colors hover:bg-destructive/10 cursor-pointer"
               onclick={() => removeCustomPanelGroup(group.id)}
             >
-              删除
+              {$t("delete")}
             </button>
           </div>
         </div>
@@ -234,13 +235,13 @@
   {#if selectedGroup}
     <div class="rounded-lg border border-border/60 bg-card/40 p-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.02)] space-y-4">
       <div class="space-y-1">
-        <div class="text-sm font-medium text-foreground">当前监控区</div>
+        <div class="text-sm font-medium text-foreground">{$t("currentMonitorArea")}</div>
         <p class="text-xs text-muted-foreground">
-          该监控区中的条目会在 overlay 中作为独立文本区域显示，并可单独拖拽和缩放。
+          {$t("currentMonitorAreaDesc")}
         </p>
       </div>
       <label class="block text-xs text-muted-foreground">
-        监控区名称
+        {$t("monitorAreaName")}
         <input
           class="mt-1 w-full max-w-sm rounded border border-border/60 bg-muted/30 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
           value={selectedGroup.name}
@@ -252,12 +253,12 @@
 
     <div class="rounded-lg border border-border/60 bg-card/40 p-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.02)] space-y-3">
       <div class="space-y-1">
-        <div class="text-sm font-medium text-foreground">添加 Buff</div>
-        <p class="text-xs text-muted-foreground">仅添加到当前监控区的文本区域</p>
+        <div class="text-sm font-medium text-foreground">{$t("addBuff")}</div>
+        <p class="text-xs text-muted-foreground">{$t("addBuffToCurrentAreaOnly")}</p>
       </div>
       <input
         class="w-full sm:w-80 rounded border border-border/60 bg-muted/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-        placeholder="搜索并添加 Buff"
+        placeholder={$t("searchAndAddBuff")}
         value={inlineBuffSearch}
         oninput={(event) => setInlineBuffSearch((event.currentTarget as HTMLInputElement).value)}
       />
@@ -268,7 +269,7 @@
           onSelect={(buffId) => addCustomPanelEntry(selectedGroup.id, "buff", buffId)}
           isDisabled={(buffId) => Boolean(getEntryLocation("buff", buffId))}
           getStatusLabel={buffStatusLabel}
-          emptyMessage="没有匹配的 Buff"
+          emptyMessage={$t("noMatchingBuffs")}
         />
       {/if}
     </div>
@@ -277,9 +278,9 @@
       <div class="space-y-1">
         <div class="flex items-center justify-between gap-3">
           <div>
-            <div class="text-sm font-medium text-foreground">自定义计数器规则</div>
+            <div class="text-sm font-medium text-foreground">{$t("customCounterRules")}</div>
             <p class="text-xs text-muted-foreground">
-              从 Source 模板和 Slot 模板中多选组合，创建可复用的计数器规则。
+              {$t("customCounterRulesDesc")}
             </p>
           </div>
           <button
@@ -294,14 +295,14 @@
               }
             }}
           >
-            {isCreatingUserRule ? "收起" : "新建规则"}
+            {isCreatingUserRule ? $t("collapse") : $t("newRule")}
           </button>
         </div>
       </div>
 
       {#if userCounterRules.length === 0}
         <div class="rounded-lg border border-dashed border-border/60 bg-muted/10 px-3 py-6 text-center text-sm text-muted-foreground">
-          还没有自定义计数器规则，先从下方模板中组合一个。
+          {$t("noCustomRules")}
         </div>
       {/if}
 
@@ -311,7 +312,7 @@
             <div class="flex flex-wrap items-start justify-between gap-3">
               <div class="flex-1 min-w-0 space-y-2">
                 <label class="block text-xs text-muted-foreground">
-                  规则名称
+                  {$t("ruleName")}
                   <input
                     class="mt-1 w-full rounded border border-border/60 bg-muted/30 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                     value={rule.name}
@@ -322,10 +323,10 @@
                   />
                 </label>
                 <div class="text-xs text-muted-foreground">
-                  Source：{getUserRuleSourceNames(rule) || "未配置"}
+                  {$t("sourceColon")}{getUserRuleSourceNames(rule) || $t("notConfigured")}
                 </div>
                 <div class="text-xs text-muted-foreground">
-                  Slot：{getUserRuleSlotNames(rule) || "未配置"}
+                  {$t("slotColon")}{getUserRuleSlotNames(rule) || $t("notConfigured")}
                 </div>
               </div>
               <button
@@ -333,7 +334,7 @@
                 class="min-h-11 rounded-md border border-border/60 px-3 py-1.5 text-xs text-destructive transition-colors hover:bg-destructive/10 cursor-pointer"
                 onclick={() => removeUserCounterRule(rule.ruleId)}
               >
-                删除
+                {$t("delete")}
               </button>
             </div>
           </div>
@@ -343,17 +344,17 @@
       {#if isCreatingUserRule}
         <div class="rounded-lg border border-primary/30 bg-primary/5 p-4 space-y-4">
           <label class="block text-xs text-muted-foreground">
-            规则名称
+            {$t("ruleName")}
             <input
               class="mt-1 w-full rounded border border-border/60 bg-muted/30 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
               value={draftRuleName}
-              placeholder="例如：居合 + Tick 能量"
+              placeholder={$t("ruleNameExample")}
               oninput={(event) => (draftRuleName = (event.currentTarget as HTMLInputElement).value)}
             />
           </label>
 
           <div class="space-y-2">
-            <div class="text-sm font-medium text-foreground">选择 Sources</div>
+            <div class="text-sm font-medium text-foreground">{$t("selectSources")}</div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
               {#each sourceTemplates as template (template.sourceId)}
                 {@const selected = draftSourceRefs.includes(template.sourceId)}
@@ -371,7 +372,7 @@
           </div>
 
           <div class="space-y-2">
-            <div class="text-sm font-medium text-foreground">选择 Slots</div>
+            <div class="text-sm font-medium text-foreground">{$t("selectSlots")}</div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
               {#each slotTemplates as template (template.slotTemplateId)}
                 {@const selected = draftSlotRefs.includes(template.slotTemplateId)}
@@ -394,7 +395,7 @@
               class="min-h-11 rounded border border-border/60 px-4 py-2 text-sm text-foreground hover:bg-muted/40 cursor-pointer"
               onclick={resetDraftRule}
             >
-              取消
+              {$t("cancel")}
             </button>
             <button
               type="button"
@@ -402,7 +403,7 @@
               onclick={submitDraftRule}
               disabled={!canSaveDraftRule}
             >
-              保存规则
+              {$t("saveRule")}
             </button>
           </div>
         </div>
@@ -411,9 +412,9 @@
 
     <div class="rounded-lg border border-border/60 bg-card/40 p-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.02)] space-y-3">
       <div class="space-y-1">
-        <div class="text-sm font-medium text-foreground">添加计数器</div>
+        <div class="text-sm font-medium text-foreground">{$t("addCounter")}</div>
         <p class="text-xs text-muted-foreground">
-          计数器槽位全局唯一，只能属于一个监控区。预设规则与自定义规则会一起显示。
+          {$t("addCounterDesc")}
         </p>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -436,17 +437,17 @@
                   </div>
                   <div class="mt-1 text-xs text-muted-foreground">
                     <span class="inline-block rounded border border-border/60 bg-muted/30 px-1.5 py-0.5">
-                      {rule.origin === "user" ? "自定义" : "预设"}
+                      {rule.origin === "user" ? $t("custom") : $t("preset")}
                     </span>
                   </div>
                 </div>
                 <div class="text-xs {exists ? 'text-primary' : 'text-muted-foreground'}">
                   {#if !exists}
-                    点击添加
+                    {$t("clickToAdd")}
                   {:else if location?.groupId === selectedGroup.id}
-                    当前组已添加
+                    {$t("alreadyAddedToCurrentGroup")}
                   {:else}
-                    已在{location?.groupName}
+                    {$t("alreadyAddedToOtherGroup", { name: location?.groupName })}
                   {/if}
                 </div>
               </div>
@@ -457,10 +458,10 @@
     </div>
 
     <div class="rounded-lg border border-border/60 bg-card/40 p-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.02)] space-y-3">
-      <div class="text-sm font-medium text-foreground">当前组条目</div>
+      <div class="text-sm font-medium text-foreground">{$t("currentGroupEntries")}</div>
       {#if selectedGroup.entries.length === 0}
         <div class="rounded-lg border border-dashed border-border/60 bg-muted/10 px-3 py-6 text-center text-sm text-muted-foreground">
-          当前监控区暂无条目
+          {$t("noEntriesInCurrentArea")}
         </div>
       {/if}
       {#each selectedGroup.entries as entry, idx (entry.id)}
@@ -473,15 +474,15 @@
         {@const buffName = entry.sourceType === "buff" ? getBuffDisplayName(entry.sourceId) : null}
         <div class="rounded-lg border border-border/60 bg-muted/20 p-3 space-y-2">
           <div class="text-xs text-muted-foreground">
-            来源：{entry.sourceType === "counter"
-              ? `计数器 - ${counterRule?.name ?? `#${entry.sourceId}`}${counterSlot ? ` #${counterSlot.slotId}` : ""}`
-              : `Buff - ${buffName}`}
+            {$t("sourceColonPrefix")}{entry.sourceType === "counter"
+              ? `${$t("counterPrefix")}${counterRule?.name ?? `#${entry.sourceId}`}${counterSlot ? ` #${counterSlot.slotId}` : ""}`
+              : `${$t("buffPrefix")}${buffName}`}
           </div>
           {#if entry.sourceType === "counter"}
             <input
               class="w-full rounded border border-border/60 bg-muted/30 px-2 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
               value={entry.label}
-              placeholder="显示名称"
+              placeholder={$t("labelPlaceholder")}
               oninput={(event) =>
                 setCustomPanelEntryLabel(
                   selectedGroup.id,
@@ -501,7 +502,7 @@
               onclick={() => moveCustomPanelEntry(selectedGroup.id, entry.id, "up")}
               disabled={idx === 0}
             >
-              上移
+              {$t("up")}
             </button>
             <button
               type="button"
@@ -509,14 +510,14 @@
               onclick={() => moveCustomPanelEntry(selectedGroup.id, entry.id, "down")}
               disabled={idx === selectedGroup.entries.length - 1}
             >
-              下移
+              {$t("down")}
             </button>
             <button
               type="button"
               class="min-h-11 rounded border border-border/60 px-3 py-1 text-xs text-destructive transition-colors hover:bg-destructive/10 cursor-pointer"
               onclick={() => removeCustomPanelEntry(selectedGroup.id, entry.id)}
             >
-              删除
+              {$t("delete")}
             </button>
           </div>
         </div>
@@ -524,19 +525,19 @@
     </div>
   {:else}
     <div class="rounded-lg border border-border/60 bg-card/40 p-6 text-sm text-muted-foreground shadow-[inset_0_1px_0_0_rgba(255,255,255,0.02)]">
-      还没有任何自定义监控区。先点击上方“新建监控区”，再向其中添加 Buff 或计数器。
+        {$t("noCustomAreaPrompt")}
     </div>
   {/if}
 
   <div class="rounded-lg border border-border/60 bg-card/40 p-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.02)] space-y-4">
     <div>
-      <h2 class="text-base font-semibold text-foreground">共享样式</h2>
-      <p class="text-xs text-muted-foreground">所有自定义监控区共用以下文字与进度条样式。</p>
+      <h2 class="text-base font-semibold text-foreground">{$t("sharedStyle")}</h2>
+      <p class="text-xs text-muted-foreground">{$t("sharedStyleDesc")}</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
       <label class="text-xs text-muted-foreground">
-        行间距: {customPanelStyle.gap}px
+        {$t("rowGapColon")}{customPanelStyle.gap}px
         <input
           class="mt-1 w-full"
           type="range"
@@ -548,7 +549,7 @@
         />
       </label>
       <label class="text-xs text-muted-foreground">
-        字体大小: {customPanelStyle.fontSize}px
+        {$t("fontSizeColon")}{customPanelStyle.fontSize}px
         <input
           class="mt-1 w-full"
           type="range"
@@ -560,7 +561,7 @@
         />
       </label>
       <label class="text-xs text-muted-foreground">
-        名称-数值间距: {customPanelStyle.columnGap}px
+        {$t("nameValueGapColon")}{customPanelStyle.columnGap}px
         <input
           class="mt-1 w-full"
           type="range"
@@ -575,7 +576,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
       <label class="flex items-center justify-between gap-2 rounded border border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
-        名称颜色
+        {$t("nameColor")}
         <input
           type="color"
           value={customPanelStyle.nameColor}
@@ -584,7 +585,7 @@
         />
       </label>
       <label class="flex items-center justify-between gap-2 rounded border border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
-        数值颜色
+        {$t("valueColor")}
         <input
           type="color"
           value={customPanelStyle.valueColor}
@@ -593,7 +594,7 @@
         />
       </label>
       <label class="flex items-center justify-between gap-2 rounded border border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
-        进度条颜色
+        {$t("progressColor")}
         <input
           type="color"
           value={customPanelStyle.progressColor}
@@ -602,7 +603,7 @@
         />
       </label>
       <label class="rounded border border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
-        <div>进度条透明度: {Math.round(customPanelStyle.progressOpacity * 100)}%</div>
+        <div>{$t("progressOpacity")}: {Math.round(customPanelStyle.progressOpacity * 100)}%</div>
         <input
           class="mt-2 w-full"
           type="range"

@@ -1,5 +1,6 @@
 <script lang="ts">
   import * as Tabs from "$lib/components/ui/tabs/index.js";
+  import { t } from "$lib/utils";
   import SettingsSwitch from "./settings-switch.svelte";
   import SettingsSelect from "./settings-select.svelte";
   import { historyDpsPlayerColumns, historyDpsSkillColumns, historyHealPlayerColumns, historyHealSkillColumns, historyTankedPlayerColumns, historyTankedSkillColumns } from "$lib/column-data";
@@ -32,7 +33,7 @@
         class="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors"
         onclick={() => toggleSection('general')}
       >
-        <h2 class="text-base font-semibold text-foreground">通用设置</h2>
+        <h2 class="text-base font-semibold text-foreground">{$t("generalSettings")}</h2>
         <ChevronDown class="w-5 h-5 text-muted-foreground transition-transform duration-200 {expandedSections.general ? 'rotate-180' : ''}" />
       </button>
       {#if expandedSections.general}
@@ -40,58 +41,58 @@
           <SettingsSelect
             bind:selected={SETTINGS.history.general.state.showYourName}
             values={[
-              { label: "显示你的名称", value: "Show Your Name" },
-              { label: "显示你的职业", value: "Show Your Class" },
-              { label: "显示你的名称 - 职业", value: "Show Your Name - Class" },
-              { label: "显示你的名称 - 专精", value: "Show Your Name - Spec" },
-              { label: "隐藏你的名称", value: "Hide Your Name" },
+              { label: $t("showYourName"), value: "Show Your Name" },
+              { label: $t("showYourClass"), value: "Show Your Class" },
+              { label: $t("showYourNameClass"), value: "Show Your Name - Class" },
+              { label: $t("showYourNameSpec"), value: "Show Your Name - Spec" },
+              { label: $t("hideYourName"), value: "Hide Your Name" },
             ]}
-            label="显示你的名称"
-            description="“显示你的职业”会用职业替代你的名称；“名称 - 职业/专精”会同时显示两者。"
+            label={$t("showYourName")}
+            description={$t("showYourNameDesc")}
           />
           <SettingsSelect
             bind:selected={SETTINGS.history.general.state.showOthersName}
             values={[
-              { label: "显示他人名称", value: "Show Others' Name" },
-              { label: "显示他人职业", value: "Show Others' Class" },
-              { label: "显示他人名称 - 职业", value: "Show Others' Name - Class" },
-              { label: "显示他人名称 - 专精", value: "Show Others' Name - Spec" },
-              { label: "隐藏他人名称", value: "Hide Others' Name" },
+              { label: $t("showOthersName"), value: "Show Others' Name" },
+              { label: $t("showOthersClass"), value: "Show Others' Class" },
+              { label: $t("showOthersNameClass"), value: "Show Others' Name - Class" },
+              { label: $t("showOthersNameSpec"), value: "Show Others' Name - Spec" },
+              { label: $t("hideOthersName"), value: "Hide Others' Name" },
             ]}
-            label="显示他人名称"
-            description="“显示他人职业”会用职业替代他人名称；“名称 - 职业/专精”会同时显示两者。"
+            label={$t("showOthersName")}
+            description={$t("showOthersNameDesc")}
           />
-          <SettingsSwitch bind:checked={SETTINGS.history.general.state.showYourAbilityScore} label="你的能力评分" description="显示你的能力评分" />
-          <SettingsSwitch bind:checked={SETTINGS.history.general.state.showOthersAbilityScore} label="他人能力评分" description="显示他人的能力评分" />
-          <SettingsSwitch bind:checked={SETTINGS.history.general.state.showYourSeasonStrength} label="你的赛季强度" description="显示你的赛季强度" />
-          <SettingsSwitch bind:checked={SETTINGS.history.general.state.showOthersSeasonStrength} label="他人赛季强度" description="显示他人的赛季强度" />
-          <SettingsSwitch bind:checked={SETTINGS.history.general.state.relativeToTopDPSPlayer} label="以最高 DPS 为基准（玩家）" description="颜色条按最高 DPS 玩家进行相对缩放，而不是按所有玩家。适用于 20 人或世界 Boss。" />
-          <SettingsSwitch bind:checked={SETTINGS.history.general.state.relativeToTopDPSSkill} label="以最高 DPS 为基准（技能）" description="颜色条按最高 DPS 技能进行相对缩放，而不是按所有技能。适用于 20 人或世界 Boss。" />
-          <SettingsSwitch bind:checked={SETTINGS.history.general.state.relativeToTopHealPlayer} label="以最高治疗为基准（玩家）" description="颜色条按最高治疗玩家进行相对缩放，而不是按所有玩家。适用于 20 人或世界 Boss。" />
-          <SettingsSwitch bind:checked={SETTINGS.history.general.state.relativeToTopHealSkill} label="以最高治疗为基准（技能）" description="颜色条按最高治疗技能进行相对缩放，而不是按所有技能。适用于 20 人或世界 Boss。" />
-          <SettingsSwitch bind:checked={SETTINGS.history.general.state.relativeToTopTankedPlayer} label="以最高承伤为基准（玩家）" description="颜色条按最高承伤玩家进行相对缩放，而不是按所有玩家。适用于 20 人或世界 Boss。" />
-          <SettingsSwitch bind:checked={SETTINGS.history.general.state.relativeToTopTankedSkill} label="以最高承伤为基准（技能）" description="颜色条按最高承伤技能进行相对缩放，而不是按所有技能。适用于 20 人或世界 Boss。" />
-          <SettingsSwitch bind:checked={SETTINGS.history.general.state.shortenTps} label="缩写 TPS 数值" description="将 TPS 显示为 5k、50k 等" />
-          <SettingsSwitch bind:checked={SETTINGS.history.general.state.shortenAbilityScore} label="缩写能力评分" description="将能力评分显示为缩写形式" />
-          <SettingsSwitch bind:checked={SETTINGS.history.general.state.shortenDps} label="缩写 DPS 数值" description="将 DPS 显示为 5k、50k 等" />
+          <SettingsSwitch bind:checked={SETTINGS.history.general.state.showYourAbilityScore} label={$t("yourAbilityScore")} description={$t("yourAbilityScoreDesc")} />
+          <SettingsSwitch bind:checked={SETTINGS.history.general.state.showOthersAbilityScore} label={$t("othersAbilityScore")} description={$t("othersAbilityScoreDesc")} />
+          <SettingsSwitch bind:checked={SETTINGS.history.general.state.showYourSeasonStrength} label={$t("yourSeasonStrength")} description={$t("yourSeasonStrengthDesc")} />
+          <SettingsSwitch bind:checked={SETTINGS.history.general.state.showOthersSeasonStrength} label={$t("othersSeasonStrength")} description={$t("othersSeasonStrengthDesc")} />
+          <SettingsSwitch bind:checked={SETTINGS.history.general.state.relativeToTopDPSPlayer} label={$t("relativeToTopDPSPlayer")} description={$t("relativeToTopDPSPlayerDesc")} />
+          <SettingsSwitch bind:checked={SETTINGS.history.general.state.relativeToTopDPSSkill} label={$t("relativeToTopDPSSkill")} description={$t("relativeToTopDPSSkillDesc")} />
+          <SettingsSwitch bind:checked={SETTINGS.history.general.state.relativeToTopHealPlayer} label={$t("relativeToTopHealPlayer")} description={$t("relativeToTopHealPlayerDesc")} />
+          <SettingsSwitch bind:checked={SETTINGS.history.general.state.relativeToTopHealSkill} label={$t("relativeToTopHealSkill")} description={$t("relativeToTopHealSkillDesc")} />
+          <SettingsSwitch bind:checked={SETTINGS.history.general.state.relativeToTopTankedPlayer} label={$t("relativeToTopTankedPlayer")} description={$t("relativeToTopTankedPlayerDesc")} />
+          <SettingsSwitch bind:checked={SETTINGS.history.general.state.relativeToTopTankedSkill} label={$t("relativeToTopTankedSkill")} description={$t("relativeToTopTankedSkillDesc")} />
+          <SettingsSwitch bind:checked={SETTINGS.history.general.state.shortenTps} label={$t("shortenTps")} description={$t("shortenTpsDesc")} />
+          <SettingsSwitch bind:checked={SETTINGS.history.general.state.shortenAbilityScore} label={$t("shortenAbilityScore")} description={$t("shortenAbilityScoreDesc")} />
+          <SettingsSwitch bind:checked={SETTINGS.history.general.state.shortenDps} label={$t("shortenDps")} description={$t("shortenDpsDesc")} />
           <SettingsSelect
             bind:selected={SETTINGS.history.general.state.abbreviationStyle}
-            label="缩写单位风格"
-            description="设置 DPS/HPS/TPS、总伤和 Boss 血量等缩写单位的显示方式"
+            label={$t("abbreviationStyle")}
+            description={$t("abbreviationStyleDesc")}
             values={[
-              { label: "西式缩写（1.2m）", value: "western" },
-              { label: "中文缩写（12.3w / 1.2亿）", value: "cn" },
+              { label: $t("westernAbbreviation"), value: "western" },
+              { label: $t("chineseAbbreviation"), value: "cn" },
             ]}
           />
           <SettingsSelect
             bind:selected={SETTINGS.history.general.state.abbreviatedDecimalPlaces}
-            label="缩写小数位数"
-            description="设置玩家表与技能明细中的 DPS/HPS/TPS 等缩写数值保留的小数位数"
+            label={$t("abbreviatedDecimalPlaces")}
+            description={$t("abbreviatedDecimalPlacesDesc")}
             values={[
-              { label: "1位 (1.2m)", value: 1 },
-              { label: "2位 (1.23m)", value: 2 },
-              { label: "3位 (1.234m)", value: 3 },
-              { label: "4位 (1.2345m)", value: 4 },
+              { label: $t("decimalPlace", { n: "1" }), value: 1 },
+              { label: $t("decimalPlace", { n: "2" }), value: 2 },
+              { label: $t("decimalPlace", { n: "3" }), value: 3 },
+              { label: $t("decimalPlace", { n: "4" }), value: 4 },
             ]}
           />
         </div>
@@ -105,7 +106,7 @@
   class="w-full flex items-center justify-between px-4 py-3 hover:bg-popover/50 transition-colors"
         onclick={() => toggleSection('dpsPlayers')}
       >
-  <h2 class="text-base font-semibold text-foreground">DPS（玩家）列</h2>
+  <h2 class="text-base font-semibold text-foreground">{$t("dpsPlayersColumns")}</h2>
   <ChevronDown class="w-5 h-5 text-muted-foreground transition-transform duration-200 {expandedSections.dpsPlayers ? 'rotate-180' : ''}" />
       </button>
       {#if expandedSections.dpsPlayers}
@@ -124,7 +125,7 @@
   class="w-full flex items-center justify-between px-4 py-3 hover:bg-popover/50 transition-colors"
         onclick={() => toggleSection('dpsSkills')}
       >
-  <h2 class="text-base font-semibold text-foreground">DPS（技能明细）列</h2>
+  <h2 class="text-base font-semibold text-foreground">{$t("dpsSkillsColumns")}</h2>
   <ChevronDown class="w-5 h-5 text-muted-foreground transition-transform duration-200 {expandedSections.dpsSkills ? 'rotate-180' : ''}" />
       </button>
       {#if expandedSections.dpsSkills}
@@ -143,7 +144,7 @@
   class="w-full flex items-center justify-between px-4 py-3 hover:bg-popover/50 transition-colors"
         onclick={() => toggleSection('healPlayers')}
       >
-  <h2 class="text-base font-semibold text-foreground">治疗（玩家）列</h2>
+  <h2 class="text-base font-semibold text-foreground">{$t("healPlayersColumns")}</h2>
   <ChevronDown class="w-5 h-5 text-muted-foreground transition-transform duration-200 {expandedSections.healPlayers ? 'rotate-180' : ''}" />
       </button>
       {#if expandedSections.healPlayers}
@@ -162,7 +163,7 @@
   class="w-full flex items-center justify-between px-4 py-3 hover:bg-popover/50 transition-colors"
         onclick={() => toggleSection('healSkills')}
       >
-  <h2 class="text-base font-semibold text-foreground">治疗（技能明细）列</h2>
+  <h2 class="text-base font-semibold text-foreground">{$t("healSkillsColumns")}</h2>
   <ChevronDown class="w-5 h-5 text-muted-foreground transition-transform duration-200 {expandedSections.healSkills ? 'rotate-180' : ''}" />
       </button>
       {#if expandedSections.healSkills}
@@ -181,7 +182,7 @@
   class="w-full flex items-center justify-between px-4 py-3 hover:bg-popover/50 transition-colors"
         onclick={() => toggleSection('tankedPlayers')}
       >
-  <h2 class="text-base font-semibold text-foreground">承伤（玩家）列</h2>
+  <h2 class="text-base font-semibold text-foreground">{$t("tankedPlayersColumns")}</h2>
   <ChevronDown class="w-5 h-5 text-muted-foreground transition-transform duration-200 {expandedSections.tankedPlayers ? 'rotate-180' : ''}" />
       </button>
       {#if expandedSections.tankedPlayers}
@@ -200,7 +201,7 @@
   class="w-full flex items-center justify-between px-4 py-3 hover:bg-popover/50 transition-colors"
         onclick={() => toggleSection('tankedSkills')}
       >
-  <h2 class="text-base font-semibold text-foreground">承伤（技能明细）列</h2>
+  <h2 class="text-base font-semibold text-foreground">{$t("tankedSkillsColumns")}</h2>
   <ChevronDown class="w-5 h-5 text-muted-foreground transition-transform duration-200 {expandedSections.tankedSkills ? 'rotate-180' : ''}" />
       </button>
       {#if expandedSections.tankedSkills}

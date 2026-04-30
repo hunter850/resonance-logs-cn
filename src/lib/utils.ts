@@ -57,8 +57,8 @@ if (typeof window !== "undefined") {
 
 export const locales = Object.keys(translations);
 
-type LocaleKey = keyof typeof translations;
-type TranslationKey = keyof typeof translations["en"];
+export type LocaleKey = keyof typeof translations;
+export type TranslationKey = keyof typeof translations["en"];
 
 function translate(locale: LocaleKey, key: TranslationKey, vars: Record<string, string>) {
   if (!key) throw new Error("no key provided to $t()");

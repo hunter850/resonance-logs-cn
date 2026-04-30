@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from "$app/stores";
+  import { t } from "$lib/utils";
   import { goto } from "$app/navigation";
   import { commands } from "$lib/bindings";
   import type { EncounterSummaryDto, HistoryEntityData } from "$lib/bindings";
@@ -113,10 +114,10 @@
   type HistoryTab = "damage" | "tanked" | "healing" | "death";
   let activeTab = $state<HistoryTab>("damage");
   const tabs: { key: HistoryTab; label: string }[] = [
-    { key: "damage", label: "伤害" },
-    { key: "tanked", label: "承伤" },
-    { key: "healing", label: "治疗" },
-    { key: "death", label: "死亡回放" },
+    { key: "damage", label: $t("damage") },
+    { key: "tanked", label: $t("tanked") },
+    { key: "healing", label: $t("healing") },
+    { key: "death", label: $t("deathReplay") },
   ];
 
   let encounterDurationSeconds = $derived.by(() => {
@@ -175,7 +176,7 @@
           isLocalPlayer: localUid !== null && entity.uid === localUid,
           className,
           classSpecName,
-          classDisplay: formatClassSpecLabel(className, classSpecName) || "未知职业",
+          classDisplay: formatClassSpecLabel(className, classSpecName) || $t("unknownClass"),
           abilityScore: entity.abilityScore || 0,
           seasonStrength: entity.seasonStrength || 0,
           totalDmg: dps?.totalDmg ?? 0,
@@ -677,7 +678,7 @@
       backToHistory();
     } catch (e) {
       console.error("Failed to delete encounter", e);
-      alert("删除战斗记录失败：" + e);
+      alert($t("deleteFailed", { error: String(e) }));
       isDeleting = false;
       showDeleteModal = false;
     }
@@ -736,8 +737,8 @@
                 <button
                   onclick={backToHistory}
                   class="p-0.5 text-muted-foreground/70 hover:text-foreground transition-colors rounded shrink-0"
-                  title="返回历史"
-                  aria-label="返回历史"
+                  title={$t("backToHistory")}
+                  aria-label={$t("backToHistory")}
                 >
                   <svg
                     class="w-4 h-4"
@@ -755,7 +756,7 @@
                   </svg>
                 </button>
                 <h2 class="text-lg font-semibold text-foreground leading-tight">
-                  {encounter.sceneName ?? "未知场景"}
+                  {encounter.sceneName ?? $t("unknownScene")}
                 </h2>
               </div>
               {#if encounter.bosses.length > 0}
@@ -775,7 +776,7 @@
               <div class="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
                 <span>{new Date(encounter.startedAtMs).toLocaleString()}</span>
                 <span class="text-muted-foreground">•</span>
-                <span>时长：{formatEncounterDuration(encounterDurationSeconds)}</span>
+                <span>{$t("durationColon")}{formatEncounterDuration(encounterDurationSeconds)}</span>
                 <span class="text-muted-foreground">•</span>
                 <span class="text-[11px] text-muted-foreground">#{encounter.id}</span>
               </div>
@@ -788,8 +789,8 @@
                 <button
                   onclick={openEncounterOnWebsite}
                   class="inline-flex items-center justify-center rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors p-2"
-                  title="在 resonance-logs.com 打开该战斗记录"
-                  aria-label="在网站打开"
+                  title={$t("openInWebsite")}
+                  aria-label={$t("openInWebsiteShort")}
                 >
                   <svg
                     class="w-4 h-4"
@@ -837,8 +838,8 @@
               <button
                 onclick={openDeleteModal}
                 class="inline-flex items-center justify-center rounded bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors p-2"
-                title="删除该战斗记录"
-                aria-label="删除战斗记录"
+                title={$t("deleteEncounter")}
+                aria-label={$t("deleteEncounter")}
               >
                 <svg
                   class="w-4 h-4"
@@ -881,7 +882,7 @@
             : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'}"
           onclick={() => (overviewTargetUid = null)}
         >
-          总计
+          {$t("total")}
         </button>
         {#each overviewTargets as target (target.targetUid)}
           <button
@@ -889,7 +890,7 @@
               ? 'bg-muted/40 text-foreground'
               : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'}"
             onclick={() => (overviewTargetUid = target.targetUid)}
-            title={`目标 #${target.targetUid}`}
+            title={`${$t("target")} #${target.targetUid}`}
           >
             {target.targetName}
           </button>
@@ -902,7 +903,7 @@
         entries={deathEntries}
         localPlayerUid={localPlayerUid}
         onSelect={(uid) => viewPlayerSkills(uid, "death")}
-        emptyMessage="本次战斗没有记录到玩家死亡。"
+        emptyMessage={$t("noDeathRecords")}
         variant="history"
       />
     {:else}
@@ -912,7 +913,7 @@
             <tr class="bg-popover/60">
               <th
                 class="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-                >玩家</th
+                >{$t("player")}</th
               >
               {#each visiblePlayerColumns as col (col.key)}
                 <th
@@ -944,8 +945,8 @@
                     <img
                       class="size-5 object-contain"
                       src={getClassIcon(p.className)}
-                      alt="职业图标"
-                      {@attach tooltip(() => p.classDisplay || "未知职业")}
+                      alt={$t("classIcon")}
+                      {@attach tooltip(() => p.classDisplay || $t("unknownClass"))}
                     />
                     <span
                       class="truncate"
@@ -988,7 +989,7 @@
                       })}
                       {#if p.isLocalPlayer}
                         <span class="ml-1 text-[oklch(0.65_0.1_250)]"
-                          >（你）</span
+                          >{$t("you")}</span
                         >
                       {/if}
                     </span>
@@ -1083,8 +1084,8 @@
         <div
           class="flex h-40 items-center justify-center rounded-lg border border-dashed border-border/60 text-muted-foreground text-xs"
         >
-          未找到该死亡记录。
-          <button class="ml-2 underline" onclick={backToDeathList}>返回列表</button>
+          {$t("deathRecordNotFound")}
+          <button class="ml-2 underline" onclick={backToDeathList}>{$t("backToList")}</button>
         </div>
       {/if}
     </div>
@@ -1095,7 +1096,8 @@
         <button
           onclick={backToEncounter}
           class="p-1.5 text-neutral-400 hover:text-neutral-200 transition-colors rounded hover:bg-neutral-800"
-          aria-label="返回战斗概览"
+          title={$t("backToEncounter")}
+          aria-label={$t("backToEncounter")}
         >
           <svg
             class="w-5 h-5"
@@ -1113,9 +1115,9 @@
           </svg>
         </button>
         <div>
-          <h2 class="text-xl font-semibold text-foreground">技能明细</h2>
+          <h2 class="text-xl font-semibold text-foreground">{$t("skillBreakdown")}</h2>
           <div class="text-sm text-neutral-400">
-            Player: {getDisplayName({
+            {$t("playerColon")} {getDisplayName({
               player: {
                 uid: selectedPlayer.uid,
                 name: selectedPlayer.name,
@@ -1135,10 +1137,10 @@
     {#if skillType === "heal"}
       <div class="mb-3 rounded border border-border/60 bg-card/30 p-3">
         <div class="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-          治疗目标分布
+          {$t("healingDealtStats")}
         </div>
         {#if healTargetSummary.length === 0}
-          <div class="text-sm text-muted-foreground">暂无目标治疗数据</div>
+          <div class="text-sm text-muted-foreground">{$t("noData")}</div>
         {:else}
           <div class="space-y-1.5">
             {#each healTargetSummary as target (target.targetUid)}
@@ -1166,7 +1168,7 @@
           <tr class="bg-popover/60">
             <th
               class="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >技能</th
+              >{$t("skillStats")}</th
             >
             {#each visibleSkillColumns as col (col.key)}
               <th
@@ -1273,7 +1275,7 @@
       </table>
     </div>
   {:else}
-    <div class="text-neutral-400">加载中...</div>
+    <div class="text-neutral-400">{$t("deleting")}</div>
   {/if}
 </div>
 
@@ -1289,7 +1291,7 @@
     <button
       class="absolute inset-0 bg-black/60 backdrop-blur-sm"
       onclick={closeDeleteModal}
-      aria-label="关闭弹窗"
+      aria-label={$t("closeModal")}
     ></button>
 
     <!-- Modal Content -->
@@ -1321,11 +1323,10 @@
             id="delete-modal-title"
             class="text-lg font-semibold text-foreground"
           >
-            Delete Encounter
+            {$t("deleteEncounter")}
           </h3>
           <p class="mt-2 text-sm text-muted-foreground">
-            Are you sure you want to delete this encounter? This action cannot
-            be undone and all associated data will be permanently removed.
+            {$t("deleteRecordsConfirm", { count: "1" })}
           </p>
         </div>
       </div>
@@ -1337,7 +1338,7 @@
           disabled={isDeleting}
           class="px-4 py-2 text-sm rounded-md border border-border bg-popover text-foreground hover:bg-muted/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Cancel
+          {$t("cancel")}
         </button>
         <button
           onclick={confirmDeleteEncounter}
@@ -1360,9 +1361,9 @@
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
-            Deleting...
+            {$t("deleting")}
           {:else}
-            Delete
+            {$t("delete")}
           {/if}
         </button>
       </div>

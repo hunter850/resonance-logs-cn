@@ -66,6 +66,7 @@
     ensureCustomPanelGroups,
     ensureInlineBuffEntries,
   } from "$lib/custom-panel-utils";
+  import { t } from "$lib/utils";
 
   type CounterRuleOption = CounterRulePreset & { origin: "preset" | "user" };
 
@@ -1165,8 +1166,8 @@
   <div class="rounded-lg border border-border/60 bg-card/40 p-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.02)] space-y-2">
     <SettingsSwitch
       bind:checked={SETTINGS.skillMonitor.state.enabled}
-      label="启用实时监控"
-      description="开启后将实时推送监控数据到悬浮窗口"
+      label={$t("enableSkillMonitor")}
+      description={$t("enabledMonitorDesc")}
     />
   </div>
 
@@ -1179,7 +1180,7 @@
           : 'bg-muted/30 text-foreground border-border/60 hover:bg-muted/50'}"
         onclick={() => (activeTab = "skill-cd")}
       >
-        技能CD
+        {$t("skillCdTab")}
       </button>
       <button
         type="button"
@@ -1188,7 +1189,7 @@
           : 'bg-muted/30 text-foreground border-border/60 hover:bg-muted/50'}"
         onclick={() => (activeTab = "buff")}
       >
-        Buff监控
+        {$t("buffMonitorTab")}
       </button>
       <button
         type="button"
@@ -1197,7 +1198,7 @@
           : 'bg-muted/30 text-foreground border-border/60 hover:bg-muted/50'}"
         onclick={() => (activeTab = "panel-attr")}
       >
-        角色面板
+        {$t("panelAttrTab")}
       </button>
       <button
         type="button"
@@ -1206,7 +1207,7 @@
           : 'bg-muted/30 text-foreground border-border/60 hover:bg-muted/50'}"
         onclick={() => (activeTab = "custom-panel")}
       >
-        自定义监控
+        {$t("customMonitorTab")}
       </button>
       <button
         type="button"
@@ -1215,7 +1216,7 @@
           : 'bg-muted/30 text-foreground border-border/60 hover:bg-muted/50'}"
         onclick={() => (activeTab = "overlay")}
       >
-        启用窗口
+        {$t("overlayTab")}
       </button>
     </div>
   </div>

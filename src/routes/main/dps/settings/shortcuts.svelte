@@ -8,6 +8,7 @@
   import * as Item from "$lib/components/ui/item/index.js";
   import * as Alert from "$lib/components/ui/alert/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
+  import { t } from "$lib/utils";
 
   import { SETTINGS } from "$lib/settings-store";
   import { registerShortcut } from "./shortcuts.js";
@@ -128,47 +129,47 @@
   let inputs: BaseInputs = [
     {
       id: "showLiveMeter",
-      label: "显示实时窗口",
+      label: $t("showLiveMeter"),
     },
     {
       id: "hideLiveMeter",
-      label: "隐藏实时窗口",
+      label: $t("hideLiveMeter"),
     },
     {
       id: "toggleLiveMeter",
-      label: "切换实时窗口",
+      label: $t("toggleLiveMeter"),
     },
     {
       id: "enableClickthrough",
-      label: "启用点击穿透",
+      label: $t("enableClickthrough"),
     },
     {
       id: "disableClickthrough",
-      label: "禁用点击穿透",
+      label: $t("disableClickthrough"),
     },
     {
       id: "toggleClickthrough",
-      label: "切换点击穿透",
+      label: $t("toggleClickthrough"),
     },
     {
       id: "resetEncounter",
-      label: "重置战斗",
+      label: $t("resetEncounter"),
     },
     {
       id: "togglePauseEncounter",
-      label: "切换暂停战斗",
+      label: $t("togglePauseEncounter"),
     },
     {
       id: "toggleBossHp",
-      label: "切换 Boss 血量显示",
+      label: $t("toggleBossHp"),
     },
     {
       id: "toggleOverlayEdit",
-      label: "切换遮罩编辑模式",
+      label: $t("toggleOverlayEdit"),
     },
     {
       id: "toggleOverlayWindow",
-      label: "切换遮罩窗口",
+      label: $t("toggleOverlayWindow"),
     },
   ];
 </script>
@@ -177,7 +178,7 @@
   <div class="space-y-3">
     <Alert.Root class="shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
     <AlertCircleIcon />
-      <Alert.Title>右键可清除快捷键</Alert.Title>
+      <Alert.Title>{$t("rightClickToClear")}</Alert.Title>
     </Alert.Root>
   <div class="rounded-lg border bg-card/40 border-border/60 p-4 space-y-2 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.02)]">
       {#each inputs as input (input.id)}
@@ -188,9 +189,9 @@
           <Item.Actions>
             <Button variant="outline" class="uppercase" onclick={() => startEdit(input)} oncontextmenu={(e: MouseEvent) => clearShortcut(input, e)}>
               {#if editingId === input.id}
-                {currentShortcutString() || "请按键"}...
+                {currentShortcutString() || $t("pleasePressKey")}...
               {:else}
-                {SETTINGS.shortcuts.state[input.id] || "未绑定"}
+                {SETTINGS.shortcuts.state[input.id] || $t("notBound")}
               {/if}
             </Button>
           </Item.Actions>

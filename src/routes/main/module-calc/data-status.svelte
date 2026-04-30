@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ModuleInfo } from "$lib/api";
+  import { t } from "$lib/utils";
 
   let {
     moduleCount = null,
@@ -20,12 +21,12 @@
 </script>
 
 <div class="rounded-lg border border-border/60 bg-card/40 p-4 space-y-1">
-  <div class="text-base font-semibold text-foreground">数据状态</div>
+  <div class="text-base font-semibold text-foreground">{$t("dataStatus")}</div>
   <div class="text-sm text-muted-foreground">
-    模组数量：{moduleCount ?? "未同步"}
+    {$t("moduleCountColon")}{moduleCount ?? $t("notSynced")}
   </div>
   <div class="text-sm text-muted-foreground">
-    总值筛选后：{moduleCount === null ? "未同步" : filteredModuleCount}
+    {$t("afterFilteringColon")}{moduleCount === null ? $t("notSynced") : filteredModuleCount}
   </div>
 </div>
 

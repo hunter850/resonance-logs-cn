@@ -6,6 +6,7 @@
   import PlayIcon from "virtual:icons/lucide/play";
   import AlertTriangle from "virtual:icons/lucide/alert-triangle";
   import Loader2 from "virtual:icons/lucide/loader-2";
+  import { t } from "$lib/utils";
 
   import DataStatus from "./data-status.svelte";
   import FilterSettings from "./filter-settings.svelte";
@@ -25,29 +26,29 @@
     ensureModuleCalcProgressListener,
   } from "$lib/stores/module-calc-store.svelte";
 
-  const ATTR_OPTIONS = [
-    { id: 1110, label: "力量加持" },
-    { id: 1111, label: "敏捷加持" },
-    { id: 1112, label: "智力加持" },
-    { id: 1113, label: "特攻伤害" },
-    { id: 1114, label: "精英打击" },
-    { id: 1205, label: "特攻治疗加持" },
-    { id: 1206, label: "专精治疗加持" },
-    { id: 1407, label: "施法专注" },
-    { id: 1408, label: "攻速专注" },
-    { id: 1409, label: "暴击专注" },
-    { id: 1410, label: "幸运专注" },
-    { id: 1307, label: "抵御魔法" },
-    { id: 1308, label: "抵御物理" },
-    { id: 2104, label: "极-伤害叠加" },
-    { id: 2105, label: "极-灵活身法" },
-    { id: 2204, label: "极-生命凝聚" },
-    { id: 2205, label: "极-急救措施" },
-    { id: 2404, label: "极-生命波动" },
-    { id: 2405, label: "极-生命汲取" },
-    { id: 2406, label: "极-全队幸暴" },
-    { id: 2304, label: "极-绝境守护" },
-  ];
+  const ATTR_OPTIONS = $derived([
+    { id: 1110, label: $t("attrStr") },
+    { id: 1111, label: $t("attrDex") },
+    { id: 1112, label: $t("attrInt") },
+    { id: 1113, label: $t("attrAtkDmg") },
+    { id: 1114, label: $t("attrEliteDmg") },
+    { id: 1205, label: $t("attrAtkHeal") },
+    { id: 1206, label: $t("attrSpecHeal") },
+    { id: 1407, label: $t("attrCastingFocus") },
+    { id: 1408, label: $t("attrAtkSpeedFocus") },
+    { id: 1409, label: $t("attrCritFocus") },
+    { id: 1410, label: $t("attrLuckyFocus") },
+    { id: 1307, label: $t("attrMagicRes") },
+    { id: 1308, label: $t("attrPhysRes") },
+    { id: 2104, label: $t("attrExDmgStack") },
+    { id: 2105, label: $t("attrExAgility") },
+    { id: 2204, label: $t("attrExHpCondense") },
+    { id: 2205, label: $t("attrExFirstAid") },
+    { id: 2404, label: $t("attrExHpWave") },
+    { id: 2405, label: $t("attrExHpLeech") },
+    { id: 2406, label: $t("attrExTeamCritLucky") },
+    { id: 2304, label: $t("attrExDesperateGuard") },
+  ]);
 
   async function refreshModules() {
     if (MODULE_CALC.loading) return;
@@ -57,7 +58,7 @@
       MODULE_CALC.modules = await getLatestModules();
       MODULE_CALC.moduleCount = MODULE_CALC.modules.length;
     } catch (e) {
-      MODULE_CALC.error = (e as Error)?.message ?? "拉取模组失败";
+      MODULE_CALC.error = (e as Error)?.message ?? $t("failedToFetchModules");
     } finally {
       MODULE_CALC.loading = false;
     }
@@ -66,7 +67,7 @@
   async function refreshGpuSupport() {
     try {
       MODULE_CALC.gpuSupport = await invoke("check_gpu_support");
-    } catch (_) {
+    } catch {
       MODULE_CALC.gpuSupport = null;
     }
   }
@@ -97,7 +98,7 @@
 
       MODULE_CALC.solutions = await optimizeLatestModules(payload);
       if (MODULE_CALC.solutions.length === 0) {
-        MODULE_CALC.error = "无可用方案，请调整筛选条件";
+        MODULE_CALC.error = $t("noAvailableSolutions");
       }
     } catch (e) {
       console.error("Optimize error:", e);
@@ -106,7 +107,7 @@
       } else if (e instanceof Error) {
         MODULE_CALC.error = e.message;
       } else {
-        MODULE_CALC.error = "计算失败: " + JSON.stringify(e);
+        MODULE_CALC.error = $t("calcFailed") + JSON.stringify(e);
       }
     } finally {
       MODULE_CALC.loading = false;
@@ -135,8 +136,8 @@
         <CalculatorIcon class="w-5 h-5" />
       </div>
       <div>
-        <h1 class="text-xl font-bold text-foreground">模组计算</h1>
-        <p class="text-sm text-muted-foreground">计算和优化模组配置</p>
+        <h1 class="text-xl font-bold text-foreground">{$t("moduleCalc")}</h1>
+        <p class="text-sm text-muted-foreground">{$t("calcModuleDesc")}</p>
       </div>
     </div>
     <div class="flex items-center gap-2">
@@ -150,7 +151,7 @@
         {:else}
           <RefreshCw class="w-4 h-4 mr-2" />
         {/if}
-        刷新数据
+        {$t("refreshData")}
       </Button>
       <Button
         onclick={runOptimize}
@@ -161,7 +162,7 @@
         {:else}
           <PlayIcon class="w-4 h-4 mr-2" />
         {/if}
-        开始计算
+        {$t("startCalc")}
       </Button>
     </div>
   </div>
@@ -199,7 +200,7 @@
   <div class="rounded-lg border border-border/60 bg-card/40 p-4 space-y-3">
     <div class="flex items-center justify-between">
       <div class="text-base font-semibold text-foreground">
-        计算结果 (Top 10)
+        {$t("calcResultTop10")}
       </div>
       {#if MODULE_CALC.loading}
         <div class="flex flex-col gap-1 w-64">
@@ -208,7 +209,7 @@
           >
             <Loader2 class="w-3 h-3 mr-1 animate-spin" />
             <span>
-              {MODULE_CALC.combinationSize === 5 ? "多策略计算中..." : "计算中..."} {MODULE_CALC.progress.max > 0
+              {MODULE_CALC.combinationSize === 5 ? $t("calculatingMulti") : $t("calculating")} {MODULE_CALC.progress.max > 0
                 ? `${Math.round((MODULE_CALC.progress.value / MODULE_CALC.progress.max) * 100)}%`
                 : ""}
             </span>

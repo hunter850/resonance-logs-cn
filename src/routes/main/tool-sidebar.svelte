@@ -6,6 +6,7 @@
   import { page } from "$app/state";
   import { TOOL_ROUTES } from "./routes.svelte";
   import { getVersion } from "@tauri-apps/api/app";
+  import { t, type TranslationKey } from "$lib/utils";
 
   // Check if current path matches or starts with the tool path
   function isActiveRoute(toolPath: string): boolean {
@@ -18,12 +19,12 @@
   <!-- Header with logo -->
   <div class="px-4 py-4 border-b border-border/50">
     <h1 class="text-lg font-bold text-foreground tracking-tight">Resonance Logs</h1>
-    <p class="text-xs text-muted-foreground mt-0.5">工具箱</p>
+    <p class="text-xs text-muted-foreground mt-0.5">{$t("toolbox")}</p>
   </div>
 
   <!-- Tool list -->
   <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
-    <p class="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">工具</p>
+    <p class="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">{$t("tools")}</p>
     {#each Object.entries(TOOL_ROUTES) as [href, route] (route.label)}
       <a
         {href}
@@ -32,7 +33,7 @@
           : 'text-muted-foreground hover:text-foreground hover:bg-popover/50'}"
       >
         <route.icon class="w-5 h-5 shrink-0" />
-        <span>{route.label}</span>
+        <span>{$t(route.label as TranslationKey)}</span>
       </a>
     {/each}
   </nav>

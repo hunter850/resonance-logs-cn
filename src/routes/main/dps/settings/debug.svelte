@@ -3,13 +3,14 @@
     import { Button } from "$lib/components/ui/button";
     import { save } from "@tauri-apps/plugin-dialog";
     import { toast } from "svelte-sonner";
+    import { t } from "$lib/utils";
 
     async function openLogDir() {
         try {
             await invoke("open_log_dir");
         } catch (e) {
             console.error(e);
-            toast.error("打开日志目录失败：" + e);
+            toast.error($t("openLogDirFailed") + e);
         }
     }
 
@@ -20,7 +21,7 @@
             const defaultName = `debug_${ts.getFullYear()}-${pad(ts.getMonth() + 1)}-${pad(ts.getDate())}_${pad(ts.getHours())}-${pad(ts.getMinutes())}-${pad(ts.getSeconds())}.zip`;
 
             const destinationPath = await save({
-                title: "保存调试压缩包",
+                title: $t("saveDebugZip"),
                 defaultPath: defaultName,
                 filters: [{ name: "Zip", extensions: ["zip"] }],
             });
@@ -34,13 +35,13 @@
             });
             try {
                 await navigator.clipboard.writeText(path);
-                toast.success("已创建调试压缩包（路径已复制）：" + path);
+                toast.success($t("debugZipCreatedCopied") + path);
             } catch {
-                toast.success("已创建调试压缩包：" + path);
+                toast.success($t("debugZipCreated") + path);
             }
         } catch (e) {
             console.error(e);
-            toast.error("创建调试压缩包失败：" + e);
+            toast.error($t("createDebugZipFailed") + e);
         }
     }
 </script>
@@ -51,26 +52,26 @@
     >
         <div class="px-4 py-3">
             <h2 class="mb-4 text-base font-semibold text-foreground">
-                调试
+                {$t("tabDebug")}
             </h2>
 
             <div class="flex items-center justify-between">
                 <div class="text-sm text-muted-foreground">
-                    <div class="font-medium text-foreground">日志文件</div>
-                    打开应用日志所在文件夹
+                    <div class="font-medium text-foreground">{$t("logFiles")}</div>
+                    {$t("openLogDirDesc")}
                 </div>
                 <Button variant="outline" onclick={openLogDir}>
-                    打开日志
+                    {$t("openLogs")}
                 </Button>
             </div>
 
             <div class="mt-4 flex items-center justify-between">
                 <div class="text-sm text-muted-foreground">
-                    <div class="font-medium text-foreground">调试压缩包</div>
-                    生成包含最近日志的 ZIP，便于支持与排查
+                    <div class="font-medium text-foreground">{$t("debugZip")}</div>
+                    {$t("debugZipDesc")}
                 </div>
                 <Button variant="outline" onclick={createDiagnosticsBundle}>
-                    创建调试压缩包
+                    {$t("createDebugZip")}
                 </Button>
             </div>
         </div>

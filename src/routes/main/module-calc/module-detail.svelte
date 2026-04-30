@@ -2,6 +2,7 @@
   import { Button } from "$lib/components/ui/button";
   import type { ModuleSolution } from "$lib/api";
   import AttrBadge, { sortAttrEntries } from "./attr-badge.svelte";
+  import { t } from "$lib/utils";
 
   let { open = $bindable(false), solution = $bindable<ModuleSolution | null>(null) } = $props();
 
@@ -40,7 +41,7 @@
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="模组方案详情"
+        aria-label={$t("solutionDetailAria")}
         tabindex="-1"
         class="flex max-h-full w-full flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/95 shadow-2xl"
         onclick={(event) => event.stopPropagation()}
@@ -50,20 +51,20 @@
           <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div class="space-y-3">
               <div class="text-xs uppercase tracking-[0.22em] text-muted-foreground">
-                方案详情
+                {$t("solutionDetail")}
               </div>
               <div class="flex flex-wrap items-end gap-3">
                 <div class="text-3xl font-semibold text-foreground">{solution.score}</div>
                 <div class="rounded-full border border-border/60 bg-background/80 px-3 py-1 text-sm text-muted-foreground">
-                  总分
+                  {$t("totalScore")}
                 </div>
                 <div class="rounded-full border border-border/60 bg-background/80 px-3 py-1 text-sm text-muted-foreground">
-                  {solution.modules.length} 个模组
+                  {$t("nModulesCount", { count: solution.modules.length.toString() })}
                 </div>
               </div>
             </div>
 
-            <Button size="sm" variant="ghost" onclick={closeDialog}>关闭</Button>
+            <Button size="sm" variant="ghost" onclick={closeDialog}>{$t("close")}</Button>
           </div>
 
           <div class="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
@@ -88,14 +89,14 @@
                     <div
                       class={`rounded-full border px-2.5 py-1 text-xs font-semibold ${getQualityClass(mod.quality)}`}
                     >
-                      品质 {mod.quality}
+                      {$t("quality", { quality: mod.quality.toString() })}
                     </div>
                   </div>
                 </div>
 
                 <div class="rounded-xl border border-border/50 bg-background/70 px-3 py-2 lg:text-right">
                   <div class="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                    属性总值
+                    {$t("totalAttributeValue")}
                   </div>
                   <div class="mt-1 text-lg font-semibold text-foreground">{totalValue}</div>
                 </div>
