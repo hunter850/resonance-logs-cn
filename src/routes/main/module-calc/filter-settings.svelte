@@ -73,7 +73,7 @@
   <div class="space-y-2">
     <div class="text-sm text-muted-foreground">{$t("targetAttributesDesc")}</div>
     <div class="flex flex-wrap gap-2">
-      {#each attributeOptions as opt}
+      {#each attributeOptions as opt (opt.id)}
         <Button
           size="sm"
           variant={targetAttributes.includes(opt.id) ? "default" : "outline"}
@@ -88,7 +88,7 @@
   <div class="space-y-2">
     <div class="text-sm text-muted-foreground">{$t("excludeAttributes")}</div>
     <div class="flex flex-wrap gap-2">
-      {#each attributeOptions as opt}
+      {#each attributeOptions as opt (opt.id)}
         <Button
           size="sm"
           variant={excludeAttributes.includes(opt.id) ? "default" : "outline"}
@@ -103,7 +103,7 @@
   <div class="space-y-3">
     <div class="text-sm text-muted-foreground">{$t("minAttributeRequirements")}</div>
     <div class="space-y-2">
-      {#each minRequirements as req, idx}
+      {#each minRequirements as req, idx (idx)}
         <div class="flex items-center gap-2">
           <select
             class="h-9 rounded-md border border-border bg-background px-2 text-sm"
@@ -112,7 +112,7 @@
               updateMin(idx, "attrId", parseNullableNumber((e.target as HTMLSelectElement).value))}
           >
             <option value="">{$t("selectAttribute")}</option>
-            {#each attributeOptions as opt}
+            {#each attributeOptions as opt (opt.id)}
               <option value={opt.id}>{opt.label}</option>
             {/each}
           </select>

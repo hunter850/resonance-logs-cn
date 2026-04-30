@@ -68,14 +68,14 @@
           </div>
 
           <div class="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-            {#each sortAttrEntries(Object.entries(solution.attr_breakdown)) as [name, value]}
+            {#each sortAttrEntries(Object.entries(solution.attr_breakdown)) as [name, value] (name)}
               <AttrBadge {name} {value} />
             {/each}
           </div>
         </div>
 
         <div class="space-y-3 overflow-y-auto p-5">
-          {#each solution.modules as mod, idx}
+          {#each solution.modules as mod, idx (mod.uuid)}
             {@const parts = mod.parts}
             {@const totalValue = getTotalValue(mod.parts)}
             <section class="rounded-xl border border-border/50 bg-muted/20 p-4 shadow-sm">
@@ -103,7 +103,7 @@
               </div>
 
               <div class="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-                {#each parts as part}
+                {#each parts as part (part.id)}
                   <AttrBadge name={part.name} value={part.value} compact />
                 {/each}
               </div>

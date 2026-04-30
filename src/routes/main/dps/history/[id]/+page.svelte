@@ -123,10 +123,7 @@
   let encounterDurationSeconds = $derived.by(() => {
     if (!encounter) return 1;
     if (encounter.duration > 0) return Math.max(1, encounter.duration);
-    return Math.max(
-      1,
-      ((encounter.endedAtMs ?? Date.now()) - encounter.startedAtMs) / 1000,
-    );
+    return Math.max(1, ((encounter.endedAtMs ?? Date.now()) - encounter.startedAtMs) / 1000);
   });
 
   function formatEncounterDuration(durationSeconds: number) {
@@ -140,12 +137,12 @@
     entities: HistoryEntityData[],
     durationSeconds: number,
     activeCombatDurationSeconds: number | null | undefined,
-    localUid: number | null,
+    localUid: number | null
   ): HistoryPlayerRow[] {
     const elapsedMs = Math.max(1, Math.floor(durationSeconds * 1000));
     const activeCombatMs = Math.max(
       1,
-      Math.floor((activeCombatDurationSeconds ?? durationSeconds) * 1000),
+      Math.floor((activeCombatDurationSeconds ?? durationSeconds) * 1000)
     );
     const source = {
       entities,
@@ -153,7 +150,10 @@
       activeCombatTimeMs: activeCombatMs,
       totalDmg: entities.reduce((sum, entity) => sum + (entity.damage?.total ?? 0), 0),
       totalHeal: entities.reduce((sum, entity) => sum + (entity.healing?.total ?? 0), 0),
-      totalDmgBossOnly: entities.reduce((sum, entity) => sum + (entity.damageBossOnly?.total ?? 0), 0),
+      totalDmgBossOnly: entities.reduce(
+        (sum, entity) => sum + (entity.damageBossOnly?.total ?? 0),
+        0
+      ),
     };
 
     const dpsRows = computePlayerRowsFromEntities(source, "dps");
@@ -223,20 +223,22 @@
     };
   }
 
-  let perTargetByUid = $derived.by(() =>
-    new Map(
-      rawEntities.map((row) => [
-        row.uid,
-        {
-          uid: row.uid,
-          dmgTargets: row.dmgPerTarget ?? [],
-          healTargets: row.healPerTarget ?? [],
-        } satisfies EntityPerTargetData,
-      ]),
-    ),
+  let perTargetByUid = $derived.by(
+    () =>
+      new Map(
+        rawEntities.map((row) => [
+          row.uid,
+          {
+            uid: row.uid,
+            dmgTargets: row.dmgPerTarget ?? [],
+            healTargets: row.healPerTarget ?? [],
+          } satisfies EntityPerTargetData,
+        ])
+      )
   );
 
   let entityNameByUid = $derived.by(() => {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const mapping = new Map<number, string>();
     for (const entity of rawEntities) {
       if (entity.name && entity.name.trim().length > 0) {
@@ -253,6 +255,7 @@
   }
 
   let overviewTargets = $derived.by(() => {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const merged = new Map<number, OverviewTargetOption>();
     for (const row of rawEntities) {
       for (const target of row.dmgPerTarget ?? []) {
@@ -273,9 +276,7 @@
     }
     return [...merged.values()]
       .filter(
-        (target) =>
-          target.targetName.trim().length > 0 &&
-          !isNumericLikeName(target.targetName),
+        (target) => target.targetName.trim().length > 0 && !isNumericLikeName(target.targetName)
       )
       .sort((a, b) => b.totalValue - a.totalValue);
   });
@@ -303,17 +304,14 @@
         targetEntities,
         encounterDurationSeconds,
         encounter?.activeCombatDuration ?? null,
-        localPlayerUid,
-      )
-        .sort((a, b) => b.totalDmg - a.totalDmg);
+        localPlayerUid
+      ).sort((a, b) => b.totalDmg - a.totalDmg);
     } else if (activeTab === "tanked") {
       return [...players]
         .filter((p) => p.damageTaken > 0)
         .sort((a, b) => b.damageTaken - a.damageTaken);
     } else if (activeTab === "healing") {
-      return [...players]
-        .filter((p) => p.healDealt > 0)
-        .sort((a, b) => b.healDealt - a.healDealt);
+      return [...players].filter((p) => p.healDealt > 0).sort((a, b) => b.healDealt - a.healDealt);
     }
     return players;
   });
@@ -355,14 +353,14 @@
         className: entity.className || "",
         classSpecName: entity.classSpecName || "",
         deaths: entity.deaths ?? [],
-      })),
+      }))
   );
 
   let selectedDeathRecord = $derived.by(() => {
     if (!selectedEntity || selectedDeathTs == null) return null;
     return (
       selectedEntity.deaths?.find(
-        (record) => Number(record.deathTimestampMs) === selectedDeathTs,
+        (record) => Number(record.deathTimestampMs) === selectedDeathTs
       ) ?? null
     );
   });
@@ -373,12 +371,14 @@
   }): FlatSkillRow[] {
     const rows: FlatSkillRow[] = [];
     const topLevel = [
-      ...grouping.groups.map(
-        (group): { kind: "group"; row: RecountGroup } => ({ kind: "group", row: group }),
-      ),
-      ...grouping.ungrouped.map(
-        (skill): { kind: "skill"; row: SkillDisplayRow } => ({ kind: "skill", row: skill }),
-      ),
+      ...grouping.groups.map((group): { kind: "group"; row: RecountGroup } => ({
+        kind: "group",
+        row: group,
+      })),
+      ...grouping.ungrouped.map((skill): { kind: "skill"; row: SkillDisplayRow } => ({
+        kind: "skill",
+        row: skill,
+      })),
     ].sort((a, b) => b.row.totalDmg - a.row.totalDmg);
 
     for (const item of topLevel) {
@@ -420,11 +420,7 @@
         .get(selectedPlayer.uid)
         ?.dmgTargets.find((target) => target.targetUid === selectedSkillTargetUid);
       if (!targetStats) return { groups: [], ungrouped: [] };
-      return groupSkillsByRecount(
-        targetStats.skills,
-        durationSecs,
-        targetStats.totalValue,
-      );
+      return groupSkillsByRecount(targetStats.skills, durationSecs, targetStats.totalValue);
     }
     const skills =
       skillType === "heal"
@@ -448,14 +444,12 @@
     return [...(perTargetByUid.get(selectedPlayer.uid)?.healTargets ?? [])]
       .map((target) => {
         const resolvedName = entityNameByUid.get(target.targetUid);
-        return resolvedName
-          ? { ...target, targetName: resolvedName }
-          : target;
+        return resolvedName ? { ...target, targetName: resolvedName } : target;
       })
       .filter(
         (target) =>
           target.totalValue > 0 &&
-          (!isNumericLikeName(target.targetName) || pushedUidSet.has(target.targetUid)),
+          (!isNumericLikeName(target.targetName) || pushedUidSet.has(target.targetUid))
       )
       .sort((a, b) => b.totalValue - a.totalValue);
   });
@@ -477,32 +471,54 @@
     return typeof value === "number" ? value : 0;
   }
 
-  let maxDpsPlayer = $derived.by(() => displayedPlayers.reduce((max, p) => Math.max(max, p.totalDmg || 0), 0));
-  let maxHealPlayer = $derived.by(() => displayedPlayers.reduce((max, p) => Math.max(max, p.healDealt || 0), 0));
-  let maxTankedPlayer = $derived.by(() => displayedPlayers.reduce((max, p) => Math.max(max, p.damageTaken || 0), 0));
-  let maxSkillTotal = $derived.by(() => flatSkillRows.reduce((max, row) => Math.max(max, rowTotalDmg(row)), 0));
+  let maxDpsPlayer = $derived.by(() =>
+    displayedPlayers.reduce((max, p) => Math.max(max, p.totalDmg || 0), 0)
+  );
+  let maxHealPlayer = $derived.by(() =>
+    displayedPlayers.reduce((max, p) => Math.max(max, p.healDealt || 0), 0)
+  );
+  let maxTankedPlayer = $derived.by(() =>
+    displayedPlayers.reduce((max, p) => Math.max(max, p.damageTaken || 0), 0)
+  );
+  let maxSkillTotal = $derived.by(() =>
+    flatSkillRows.reduce((max, row) => Math.max(max, rowTotalDmg(row)), 0)
+  );
 
   // Get visible columns based on settings and active tab
   let visiblePlayerColumns = $derived.by(() => {
     if (activeTab === "healing") {
-      return historyHealPlayerColumns.filter((col) => settings.state.history.heal.players[col.key] ?? true);
+      return historyHealPlayerColumns.filter(
+        (col) => settings.state.history.heal.players[col.key] ?? true
+      );
     } else if (activeTab === "tanked") {
-      return historyTankedPlayerColumns.filter((col) => settings.state.history.tanked.players[col.key] ?? true);
+      return historyTankedPlayerColumns.filter(
+        (col) => settings.state.history.tanked.players[col.key] ?? true
+      );
     }
     return historyDpsPlayerColumns.filter((col) => {
-      const defaultValue = DEFAULT_HISTORY_STATS[col.key as keyof typeof DEFAULT_HISTORY_STATS] ?? true;
-      const setting = settings.state.history.dps.players[col.key as keyof typeof settings.state.history.dps.players];
+      const defaultValue =
+        DEFAULT_HISTORY_STATS[col.key as keyof typeof DEFAULT_HISTORY_STATS] ?? true;
+      const setting =
+        settings.state.history.dps.players[
+          col.key as keyof typeof settings.state.history.dps.players
+        ];
       return setting ?? defaultValue;
     });
   });
 
   let visibleSkillColumns = $derived.by(() => {
     if (skillType === "heal") {
-      return historyHealSkillColumns.filter((col) => settings.state.history.heal.skillBreakdown[col.key]);
+      return historyHealSkillColumns.filter(
+        (col) => settings.state.history.heal.skillBreakdown[col.key]
+      );
     } else if (skillType === "tanked") {
-      return historyTankedSkillColumns.filter((col) => settings.state.history.tanked.skillBreakdown[col.key]);
+      return historyTankedSkillColumns.filter(
+        (col) => settings.state.history.tanked.skillBreakdown[col.key]
+      );
     }
-    return historyDpsSkillColumns.filter((col) => settings.state.history.dps.skillBreakdown[col.key]);
+    return historyDpsSkillColumns.filter(
+      (col) => settings.state.history.dps.skillBreakdown[col.key]
+    );
   });
 
   const websiteBaseUrl = $derived.by(() => {
@@ -512,6 +528,7 @@
     }
 
     try {
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity
       const url = new URL(apiBase);
       if (url.hostname.startsWith("api.")) {
         url.hostname = url.hostname.replace(/^api\./, "");
@@ -524,13 +541,12 @@
     }
   });
   let abbreviatedDecimalPlaces = $derived(
-    SETTINGS.history.general.state.abbreviatedDecimalPlaces ?? 1,
+    SETTINGS.history.general.state.abbreviatedDecimalPlaces ?? 1
   );
-  let abbreviationStyle = $derived(
-    SETTINGS.history.general.state.abbreviationStyle,
-  );
+  let abbreviationStyle = $derived(SETTINGS.history.general.state.abbreviationStyle);
 
   function toggleGroup(id: number) {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const next = new Set(expandedGroups);
     if (next.has(id)) {
       next.delete(id);
@@ -560,23 +576,20 @@
       }
       encounter = encounterRes.data;
       localPlayerUid =
-        (encounterRes.data as { localPlayerId?: number | null }).localPlayerId ??
-        null;
+        (encounterRes.data as { localPlayerId?: number | null }).localPlayerId ?? null;
       rawEntities = entitiesRes.data;
       const durationSeconds =
         encounterRes.data.duration > 0
           ? Math.max(1, encounterRes.data.duration)
           : Math.max(
               1,
-              ((encounterRes.data.endedAtMs ?? Date.now()) -
-                encounterRes.data.startedAtMs) /
-                1000,
+              ((encounterRes.data.endedAtMs ?? Date.now()) - encounterRes.data.startedAtMs) / 1000
             );
       players = buildHistoryPlayers(
         rawEntities,
         durationSeconds,
         encounterRes.data.activeCombatDuration ?? null,
-        localPlayerUid,
+        localPlayerUid
       );
     } catch (err) {
       error = err instanceof Error ? err.message : String(err);
@@ -584,7 +597,7 @@
   }
 
   function viewPlayerSkills(playerUid: number, type = "dps", targetUid?: number | null) {
-
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const sp = new URLSearchParams($page.url.searchParams);
     sp.set("charId", String(playerUid));
     sp.set("skillType", type);
@@ -599,6 +612,7 @@
   }
 
   function viewDeathReplay(playerUid: number, deathTs: number) {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const sp = new URLSearchParams($page.url.searchParams);
     sp.set("charId", String(playerUid));
     sp.set("skillType", "death");
@@ -608,6 +622,7 @@
   }
 
   function backToDeathPlayerList() {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const sp = new URLSearchParams($page.url.searchParams);
     sp.delete("charId");
     sp.delete("deathTs");
@@ -617,6 +632,7 @@
   }
 
   function backToDeathList() {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const sp = new URLSearchParams($page.url.searchParams);
     sp.delete("deathTs");
     sp.delete("targetUid");
@@ -625,7 +641,7 @@
   }
 
   function backToEncounter() {
-
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const sp = new URLSearchParams($page.url.searchParams);
     sp.delete("charId");
     sp.delete("skillType");
@@ -636,8 +652,8 @@
   }
 
   function backToHistory() {
-
     // Return to the history list while preserving list state.
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const sp = new URLSearchParams($page.url.searchParams);
     sp.delete("charId");
     sp.delete("skillType");
@@ -700,12 +716,11 @@
   });
 
   $effect(() => {
-    charId;
+    void charId;
     expandedGroups = new Set<number>();
   });
 
   $effect(() => {
-    activeTab;
     if (activeTab !== "damage") {
       overviewTargetUid = null;
     }
@@ -718,7 +733,6 @@
       activeTab = "death";
     }
   });
-
 </script>
 
 <div class="">
@@ -762,11 +776,8 @@
               {#if encounter.bosses.length > 0}
                 <div class="w-full mt-1">
                   <div class="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
-                    {#each encounter.bosses as b, i}
-                      <span
-                        class={b.isDefeated
-                          ? "text-destructive line-through"
-                          : "text-primary"}
+                    {#each encounter.bosses as b, i (b)}
+                      <span class={b.isDefeated ? "text-destructive line-through" : "text-primary"}
                         >{b.monsterName}{i < encounter.bosses.length - 1 ? "," : ""}</span
                       >
                     {/each}
@@ -776,7 +787,8 @@
               <div class="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
                 <span>{new Date(encounter.startedAtMs).toLocaleString()}</span>
                 <span class="text-muted-foreground">•</span>
-                <span>{$t("durationColon")}{formatEncounterDuration(encounterDurationSeconds)}</span>
+                <span>{$t("durationColon")}{formatEncounterDuration(encounterDurationSeconds)}</span
+                >
                 <span class="text-muted-foreground">•</span>
                 <span class="text-[11px] text-muted-foreground">#{encounter.id}</span>
               </div>
@@ -792,12 +804,7 @@
                   title={$t("openInWebsite")}
                   aria-label={$t("openInWebsiteShort")}
                 >
-                  <svg
-                    class="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -813,12 +820,8 @@
                 class="inline-flex items-center justify-center rounded transition-colors p-2 {encounter.isFavorite
                   ? 'bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20'
                   : 'bg-muted/40 text-muted-foreground hover:bg-muted/60 hover:text-foreground'}"
-                title={encounter.isFavorite
-                  ? "取消收藏"
-                  : "加入收藏"}
-                aria-label={encounter.isFavorite
-                  ? "取消收藏"
-                  : "加入收藏"}
+                title={encounter.isFavorite ? "取消收藏" : "加入收藏"}
+                aria-label={encounter.isFavorite ? "取消收藏" : "加入收藏"}
               >
                 <svg
                   class="w-4 h-4"
@@ -841,12 +844,7 @@
                 title={$t("deleteEncounter")}
                 aria-label={$t("deleteEncounter")}
               >
-                <svg
-                  class="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -858,7 +856,7 @@
             </div>
 
             <div class="flex rounded border border-border bg-popover">
-              {#each tabs as tab}
+              {#each tabs as tab (tab.key)}
                 <button
                   onclick={() => (activeTab = tab.key)}
                   class="px-3 py-1 text-xs rounded transition-colors {activeTab === tab.key
@@ -877,7 +875,8 @@
     {#if activeTab === "damage" && overviewTargets.length > 0}
       <div class="mb-3 flex flex-wrap gap-1.5">
         <button
-          class="px-3 py-1 text-xs rounded border border-border transition-colors {overviewTargetUid === null
+          class="px-3 py-1 text-xs rounded border border-border transition-colors {overviewTargetUid ===
+          null
             ? 'bg-muted/40 text-foreground'
             : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'}"
           onclick={() => (overviewTargetUid = null)}
@@ -886,7 +885,8 @@
         </button>
         {#each overviewTargets as target (target.targetUid)}
           <button
-            class="px-3 py-1 text-xs rounded border border-border transition-colors {overviewTargetUid === target.targetUid
+            class="px-3 py-1 text-xs rounded border border-border transition-colors {overviewTargetUid ===
+            target.targetUid
               ? 'bg-muted/40 text-foreground'
               : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'}"
             onclick={() => (overviewTargetUid = target.targetUid)}
@@ -901,13 +901,13 @@
     {#if activeTab === "death"}
       <DeathPlayerList
         entries={deathEntries}
-        localPlayerUid={localPlayerUid}
+        {localPlayerUid}
         onSelect={(uid) => viewPlayerSkills(uid, "death")}
         emptyMessage={$t("noDeathRecords")}
         variant="history"
       />
     {:else}
-    <div class="overflow-x-auto rounded border border-border/60 bg-card/30">
+      <div class="overflow-x-auto rounded border border-border/60 bg-card/30">
         <table class="w-full border-collapse">
           <thead>
             <tr class="bg-popover/60">
@@ -930,17 +930,11 @@
                 onclick={() =>
                   viewPlayerSkills(
                     p.uid,
-                    activeTab === "healing"
-                      ? "heal"
-                      : activeTab === "tanked"
-                        ? "tanked"
-                        : "dps",
-                    activeTab === "damage" ? overviewTargetUid : null,
+                    activeTab === "healing" ? "heal" : activeTab === "tanked" ? "tanked" : "dps",
+                    activeTab === "damage" ? overviewTargetUid : null
                   )}
               >
-                <td
-                  class="px-3 py-3 text-sm text-muted-foreground relative z-10"
-                >
+                <td class="px-3 py-3 text-sm text-muted-foreground relative z-10">
                   <div class="flex items-center gap-2 h-full">
                     <img
                       class="size-5 object-contain"
@@ -948,28 +942,19 @@
                       alt={$t("classIcon")}
                       {@attach tooltip(() => p.classDisplay || $t("unknownClass"))}
                     />
-                    <span
-                      class="truncate"
-                      {@attach tooltip(() => `UID: #${p.uid}`)}
-                    >
-                      {#if (p.abilityScore > 0 && (p.isLocalPlayer
-                        ? SETTINGS.history.general.state.showYourAbilityScore
-                        : SETTINGS.history.general.state.showOthersAbilityScore)) || (p.seasonStrength > 0 && (p.isLocalPlayer
-                        ? SETTINGS.history.general.state.showYourSeasonStrength
-                        : SETTINGS.history.general.state.showOthersSeasonStrength))}
-                        <span class="inline-flex items-center gap-0 text-muted-foreground tabular-nums">
-                          {#if p.abilityScore > 0 && (p.isLocalPlayer
-                            ? SETTINGS.history.general.state.showYourAbilityScore
-                            : SETTINGS.history.general.state.showOthersAbilityScore)}
+                    <span class="truncate" {@attach tooltip(() => `UID: #${p.uid}`)}>
+                      {#if (p.abilityScore > 0 && (p.isLocalPlayer ? SETTINGS.history.general.state.showYourAbilityScore : SETTINGS.history.general.state.showOthersAbilityScore)) || (p.seasonStrength > 0 && (p.isLocalPlayer ? SETTINGS.history.general.state.showYourSeasonStrength : SETTINGS.history.general.state.showOthersSeasonStrength))}
+                        <span
+                          class="inline-flex items-center gap-0 text-muted-foreground tabular-nums"
+                        >
+                          {#if p.abilityScore > 0 && (p.isLocalPlayer ? SETTINGS.history.general.state.showYourAbilityScore : SETTINGS.history.general.state.showOthersAbilityScore)}
                             {#if SETTINGS.history.general.state.shortenAbilityScore}
                               <AbbreviatedNumber num={p.abilityScore} />
                             {:else}
                               <span>{p.abilityScore}</span>
                             {/if}
                           {/if}
-                          {#if p.seasonStrength > 0 && (p.isLocalPlayer
-                            ? SETTINGS.history.general.state.showYourSeasonStrength
-                            : SETTINGS.history.general.state.showOthersSeasonStrength)}
+                          {#if p.seasonStrength > 0 && (p.isLocalPlayer ? SETTINGS.history.general.state.showYourSeasonStrength : SETTINGS.history.general.state.showOthersSeasonStrength)}
                             <span>({p.seasonStrength})</span>
                           {/if}
                         </span>
@@ -981,24 +966,18 @@
                           className: p.className,
                           classSpecName: p.classSpecName,
                         },
-                        showYourNameSetting:
-                          settings.state.history.general.showYourName,
-                        showOthersNameSetting:
-                          settings.state.history.general.showOthersName,
+                        showYourNameSetting: settings.state.history.general.showYourName,
+                        showOthersNameSetting: settings.state.history.general.showOthersName,
                         isLocalPlayer: p.isLocalPlayer,
                       })}
                       {#if p.isLocalPlayer}
-                        <span class="ml-1 text-[oklch(0.65_0.1_250)]"
-                          >{$t("you")}</span
-                        >
+                        <span class="ml-1 text-[oklch(0.65_0.1_250)]">{$t("you")}</span>
                       {/if}
                     </span>
                   </div>
                 </td>
                 {#each visiblePlayerColumns as col (col.key)}
-                  <td
-                    class="px-3 py-3 text-right text-sm text-muted-foreground relative z-10"
-                  >
+                  <td class="px-3 py-3 text-right text-sm text-muted-foreground relative z-10">
                     {#if (activeTab === "damage" && (col.key === "totalDmg" || col.key === "bossDmg" || col.key === "bossDps" || col.key === "dps" || col.key === "tdps") && SETTINGS.history.general.state.shortenDps) || (activeTab === "healing" && (col.key === "healDealt" || col.key === "hps" || col.key === "effectiveHeal" || col.key === "ehps") && SETTINGS.history.general.state.shortenDps) || (activeTab === "tanked" && (col.key === "damageTaken" || col.key === "tankedPS") && SETTINGS.history.general.state.shortenTps)}
                       {#if activeTab === "tanked" ? SETTINGS.history.general.state.shortenTps : SETTINGS.history.general.state.shortenDps}
                         <AbbreviatedNumber
@@ -1017,17 +996,15 @@
                 <TableRowGlow
                   className={p.className}
                   percentage={activeTab === "healing"
-                    ? SETTINGS.history.general.state.relativeToTopHealPlayer &&
-                      maxHealPlayer > 0
+                    ? SETTINGS.history.general.state.relativeToTopHealPlayer && maxHealPlayer > 0
                       ? (p.healDealt / maxHealPlayer) * 100
                       : p.healPct
                     : activeTab === "tanked"
-                      ? SETTINGS.history.general.state
-                          .relativeToTopTankedPlayer && maxTankedPlayer > 0
+                      ? SETTINGS.history.general.state.relativeToTopTankedPlayer &&
+                        maxTankedPlayer > 0
                         ? (p.damageTaken / maxTankedPlayer) * 100
                         : p.tankedPct
-                      : SETTINGS.history.general.state.relativeToTopDPSPlayer &&
-                          maxDpsPlayer > 0
+                      : SETTINGS.history.general.state.relativeToTopDPSPlayer && maxDpsPlayer > 0
                         ? (p.totalDmg / maxDpsPlayer) * 100
                         : p.dmgPct}
                 />
@@ -1035,7 +1012,7 @@
             {/each}
           </tbody>
         </table>
-    </div>
+      </div>
     {/if}
   {:else if charId && selectedPlayer && selectedEntity && skillType === "death"}
     <!-- Death Replay: list or detail -->
@@ -1117,7 +1094,8 @@
         <div>
           <h2 class="text-xl font-semibold text-foreground">{$t("skillBreakdown")}</h2>
           <div class="text-sm text-neutral-400">
-            {$t("playerColon")} {getDisplayName({
+            {$t("playerColon")}
+            {getDisplayName({
               player: {
                 uid: selectedPlayer.uid,
                 name: selectedPlayer.name,
@@ -1125,8 +1103,7 @@
                 classSpecName: selectedPlayer.classSpecName,
               },
               showYourNameSetting: settings.state.history.general.showYourName,
-              showOthersNameSetting:
-                settings.state.history.general.showOthersName,
+              showOthersNameSetting: settings.state.history.general.showOthersName,
               isLocalPlayer: selectedPlayer.isLocalPlayer,
             })} <span class="text-neutral-500">#{selectedPlayer.uid}</span>
           </div>
@@ -1180,11 +1157,8 @@
         </thead>
         <tbody class="bg-background/40">
           {#each flatSkillRows as item (item.key)}
-            <tr
-              class="relative border-t border-border/40 hover:bg-muted/60 transition-colors"
-            >
-              <td class="px-3 py-3 text-sm text-muted-foreground relative z-10"
-              >
+            <tr class="relative border-t border-border/40 hover:bg-muted/60 transition-colors">
+              <td class="px-3 py-3 text-sm text-muted-foreground relative z-10">
                 {#if item.kind === "group"}
                   <button
                     class="inline-flex items-center gap-1.5 hover:text-foreground transition-colors"
@@ -1192,7 +1166,7 @@
                   >
                     <svg
                       class="size-3 shrink-0 text-muted-foreground/70 transition-transform duration-150 {expandedGroups.has(
-                        item.row.recountId,
+                        item.row.recountId
                       )
                         ? 'rotate-90'
                         : ''}"
@@ -1229,12 +1203,9 @@
                     {/if}
                   </div>
                 {/if}
-              </td
-              >
+              </td>
               {#each visibleSkillColumns as col (col.key)}
-                <td
-                  class="px-3 py-3 text-right text-sm text-muted-foreground relative z-10"
-                >
+                <td class="px-3 py-3 text-right text-sm text-muted-foreground relative z-10">
                   {#if (col.key === "totalDmg" || col.key === "dps" || col.key === "effectiveTotal" || col.key === "effectiveDps") && (skillType === "tanked" ? SETTINGS.history.general.state.shortenTps : SETTINGS.history.general.state.shortenDps)}
                     <AbbreviatedNumber
                       num={skillCellValue(item, col.key)}
@@ -1255,17 +1226,14 @@
               <TableRowGlow
                 className={selectedPlayer.className}
                 percentage={skillType === "heal"
-                  ? SETTINGS.history.general.state.relativeToTopHealSkill &&
-                    maxSkillTotal > 0
+                  ? SETTINGS.history.general.state.relativeToTopHealSkill && maxSkillTotal > 0
                     ? (rowTotalDmg(item) / maxSkillTotal) * 100
                     : rowDmgPct(item)
                   : skillType === "tanked"
-                    ? SETTINGS.history.general.state.relativeToTopTankedSkill &&
-                      maxSkillTotal > 0
+                    ? SETTINGS.history.general.state.relativeToTopTankedSkill && maxSkillTotal > 0
                       ? (rowTotalDmg(item) / maxSkillTotal) * 100
                       : rowDmgPct(item)
-                    : SETTINGS.history.general.state.relativeToTopDPSSkill &&
-                        maxSkillTotal > 0
+                    : SETTINGS.history.general.state.relativeToTopDPSSkill && maxSkillTotal > 0
                       ? (rowTotalDmg(item) / maxSkillTotal) * 100
                       : rowDmgPct(item)}
               />
@@ -1319,10 +1287,7 @@
         </div>
 
         <div class="flex-1">
-          <h3
-            id="delete-modal-title"
-            class="text-lg font-semibold text-foreground"
-          >
+          <h3 id="delete-modal-title" class="text-lg font-semibold text-foreground">
             {$t("deleteEncounter")}
           </h3>
           <p class="mt-2 text-sm text-muted-foreground">
@@ -1367,6 +1332,6 @@
           {/if}
         </button>
       </div>
+    </div>
   </div>
-</div>
 {/if}

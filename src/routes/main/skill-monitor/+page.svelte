@@ -72,31 +72,43 @@
 
   const availableBuffs = getAvailableBuffDefinitions();
   const buffCategoryDefinitions = getBuffCategoryDefinitions();
+  const buffAliases = $derived.by(() =>
+    ensureBuffAliases(SETTINGS.skillMonitor.state.buffAliases),
+  );
   let buffSearch = $state("");
-  let buffSearchResults = $state<BuffNameInfo[]>([]);
+  const buffSearchResults = $derived(searchBuffsByName(buffSearch, buffAliases));
   let globalPrioritySearch = $state("");
-  let globalPrioritySearchResults = $state<BuffNameInfo[]>([]);
+  const globalPrioritySearchResults = $derived(searchBuffsByName(globalPrioritySearch, buffAliases));
   let groupSearchKeyword = $state<Record<string, string>>({});
-  let groupSearchResults = $state<Record<string, BuffNameInfo[]>>({});
+  const groupSearchResults = $derived.by(() => {
+    const results: Record<string, BuffNameInfo[]> = {};
+    for (const [groupId, keyword] of Object.entries(groupSearchKeyword)) {
+      results[groupId] = searchBuffsByName(keyword, buffAliases);
+    }
+    return results;
+  });
   let groupPrioritySearchKeyword = $state<Record<string, string>>({});
-  let groupPrioritySearchResults = $state<Record<string, BuffNameInfo[]>>({});
+  const groupPrioritySearchResults = $derived.by(() => {
+    const results: Record<string, BuffNameInfo[]> = {};
+    for (const [groupId, keyword] of Object.entries(groupPrioritySearchKeyword)) {
+      results[groupId] = searchBuffsByName(keyword, buffAliases);
+    }
+    return results;
+  });
   let resonanceSearch = $state("");
   let inlineBuffSearch = $state("");
-  let inlineBuffSearchResults = $state<BuffNameInfo[]>([]);
+  const inlineBuffSearchResults = $derived(searchBuffsByName(inlineBuffSearch, buffAliases));
   let activeTab = $state<"skill-cd" | "buff" | "panel-attr" | "custom-panel" | "overlay">("skill-cd");
   let attrSectionExpanded = $state(false);
   let buffAliasSectionExpanded = $state(false);
   let buffAliasSearch = $state("");
-  let buffAliasSearchResults = $state<BuffNameInfo[]>([]);
+  const buffAliasSearchResults = $derived(searchBuffsByName(buffAliasSearch, buffAliases));
   let buffAliasEditingBuffId = $state<number | null>(null);
 
   const classConfigs = $derived(getClassConfigs());
   const counterRules = $derived(getCounterRules());
   const sourceTemplates = $derived(getSourceTemplates());
   const slotTemplates = $derived(getSlotTemplates());
-  const buffAliases = $derived.by(() =>
-    ensureBuffAliases(SETTINGS.skillMonitor.state.buffAliases),
-  );
   const activeProfile = $derived.by(() => activeProfileOrDefault());
   const selectedClassKey = $derived(activeProfile.selectedClass);
   const classSkills = $derived(getSkillsByClass(selectedClassKey));
@@ -174,6 +186,7 @@
   const customPanelGroups = $derived.by(() => ensureCustomPanelGroups(activeProfile));
   const panelAreaRowOrder = $derived.by(() => ensurePanelAreaRowOrder(activeProfile));
   const filteredInlineBuffSearchResults = $derived.by(() => {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const ids = new Set<number>();
     return inlineBuffSearchResults.filter((item) => {
       if (ids.has(item.baseId)) return false;
@@ -412,6 +425,7 @@
   }
 
   const filteredBuffs = $derived.by(() => {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const ids = new Set<number>();
     const merged: BuffNameInfo[] = [];
     for (const item of buffSearchResults) {
@@ -422,6 +436,7 @@
     return merged;
   });
   const availableBuffMap = $derived.by(() => {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const map = new Map<number, BuffDefinition>();
     for (const buff of availableBuffs) {
       map.set(buff.baseId, buff);
@@ -434,22 +449,6 @@
         .map((id) => availableBuffMap.get(id))
         .filter(Boolean) as BuffDefinition[],
   );
-
-  $effect(() => {
-    buffSearchResults = searchBuffsByName(buffSearch, buffAliases);
-  });
-
-  $effect(() => {
-    globalPrioritySearchResults = searchBuffsByName(globalPrioritySearch, buffAliases);
-  });
-
-  $effect(() => {
-    inlineBuffSearchResults = searchBuffsByName(inlineBuffSearch, buffAliases);
-  });
-
-  $effect(() => {
-    buffAliasSearchResults = searchBuffsByName(buffAliasSearch, buffAliases);
-  });
 
   function setBuffAliasSearch(value: string) {
     buffAliasSearch = value;
@@ -977,15 +976,9 @@
     const nextKeyword = { ...groupSearchKeyword };
     delete nextKeyword[groupId];
     groupSearchKeyword = nextKeyword;
-    const nextResults = { ...groupSearchResults };
-    delete nextResults[groupId];
-    groupSearchResults = nextResults;
     const nextPriorityKeyword = { ...groupPrioritySearchKeyword };
     delete nextPriorityKeyword[groupId];
     groupPrioritySearchKeyword = nextPriorityKeyword;
-    const nextPriorityResults = { ...groupPrioritySearchResults };
-    delete nextPriorityResults[groupId];
-    groupPrioritySearchResults = nextPriorityResults;
   }
 
   function addIndividualMonitorAll() {
@@ -1026,15 +1019,6 @@
 
   function setGroupSearchKeyword(groupId: string, value: string) {
     groupSearchKeyword = { ...groupSearchKeyword, [groupId]: value };
-    const keyword = value.trim();
-    if (!keyword) {
-      groupSearchResults = { ...groupSearchResults, [groupId]: [] };
-      return;
-    }
-    groupSearchResults = {
-      ...groupSearchResults,
-      [groupId]: searchBuffsByName(keyword, buffAliases),
-    };
   }
 
   function getGroupSearchKeyword(groupId: string) {
@@ -1043,15 +1027,6 @@
 
   function setGroupPrioritySearchKeyword(groupId: string, value: string) {
     groupPrioritySearchKeyword = { ...groupPrioritySearchKeyword, [groupId]: value };
-    const keyword = value.trim();
-    if (!keyword) {
-      groupPrioritySearchResults = { ...groupPrioritySearchResults, [groupId]: [] };
-      return;
-    }
-    groupPrioritySearchResults = {
-      ...groupPrioritySearchResults,
-      [groupId]: searchBuffsByName(keyword, buffAliases),
-    };
   }
 
   function getGroupPrioritySearchKeyword(groupId: string) {
@@ -1060,6 +1035,7 @@
 
   function getGroupSearchResults(group: BuffGroup): BuffNameInfo[] {
     const results = groupSearchResults[group.id] ?? [];
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const ids = new Set<number>();
     return results.filter((item) => {
       if (ids.has(item.baseId)) return false;
@@ -1072,6 +1048,7 @@
 
   function getGroupPrioritySearchResults(group: BuffGroup): BuffNameInfo[] {
     const results = groupPrioritySearchResults[group.id] ?? [];
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const ids = new Set<number>();
     return results.filter((item) => {
       if (ids.has(item.baseId)) return false;

@@ -17,7 +17,7 @@
   <div class="text-sm text-muted-foreground">{$t("noResults")}</div>
 {:else}
   <div class="space-y-3">
-    {#each solutions as sol, idx}
+    {#each solutions as sol, idx (idx)}
       {@const attrs = sortAttrEntries(Object.entries(sol.attr_breakdown))}
       <article
         class={`rounded-xl border p-4 transition-all duration-200 ${idx === 0
@@ -42,7 +42,7 @@
           </div>
 
           <div class="grid flex-1 gap-2 sm:grid-cols-2 2xl:grid-cols-3">
-            {#each attrs as [name, value]}
+            {#each attrs as [name, value] (name)}
               <AttrBadge {name} {value} compact />
             {/each}
           </div>
